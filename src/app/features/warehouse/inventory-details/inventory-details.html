@@ -1,0 +1,609 @@
+<div class="details-page">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="breadcrumb">
+
+        <a routerLink="/warehouse">
+          Warehouse
+        </a>
+
+        <mat-icon>chevron_right</mat-icon>
+
+        <a routerLink="/warehouse/inventory">
+          Inventory
+        </a>
+
+        <mat-icon>chevron_right</mat-icon>
+
+        <span>{{ item().id }}</span>
+
+      </div>
+
+      <div class="title-row">
+
+        <div class="title-icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+
+        <div>
+
+          <h1>{{ item().name }}</h1>
+
+          <p>
+            {{ item().id }} · {{ item().category }}
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+      <button
+        mat-stroked-button
+        routerLink="/warehouse/inventory">
+
+        <mat-icon>arrow_back</mat-icon>
+        Back to Inventory
+
+      </button>
+
+      <button
+        mat-stroked-button
+        (click)="editItem()">
+
+        <mat-icon>edit</mat-icon>
+        Edit
+
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="adjustStock()">
+
+        <mat-icon>add_box</mat-icon>
+        Adjust Stock
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Status Banner -->
+
+  <div
+    class="status-banner"
+    [class.low-stock-banner]="item().status === 'LOW_STOCK'"
+    [class.out-of-stock-banner]="item().status === 'OUT_OF_STOCK'">
+
+    <div class="status-left">
+
+      <mat-icon>
+        {{ getStatusIcon(item().status) }}
+      </mat-icon>
+
+      <div>
+
+        <strong>
+          {{ getStatusLabel(item().status) }}
+        </strong>
+
+        <span>
+          Inventory status is currently {{ getStatusLabel(item().status).toLowerCase() }}.
+        </span>
+
+      </div>
+
+    </div>
+
+    <div class="updated">
+
+      Last updated:
+      <strong>{{ item().lastUpdated }}</strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- Main Grid -->
+
+  <div class="main-grid">
+
+
+    <!-- Inventory Information -->
+
+    <mat-card class="details-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>Inventory Information</h2>
+
+          <p>Basic inventory and warehouse details</p>
+
+        </div>
+
+        <mat-icon>info</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+
+      <div class="info-grid">
+
+        <div class="info-item">
+
+          <span>Inventory ID</span>
+          <strong>{{ item().id }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Category</span>
+          <strong>{{ item().category }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Warehouse</span>
+          <strong>{{ item().location }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Warehouse Zone</span>
+          <strong>{{ item().warehouseZone }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Current Quantity</span>
+          <strong>{{ item().quantity }} units</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Minimum Stock</span>
+          <strong>{{ item().minStock }} units</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Maximum Stock</span>
+          <strong>{{ item().maxStock }} units</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Unit Price</span>
+          <strong>₹{{ item().unitPrice | number }}</strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="description">
+
+        <span>Description</span>
+
+        <p>
+          {{ item().description }}
+        </p>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Stock Level -->
+
+    <mat-card class="details-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>Stock Level</h2>
+
+          <p>Current stock utilization</p>
+
+        </div>
+
+        <mat-icon>bar_chart</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+
+      <div class="stock-level">
+
+        <div class="stock-number">
+
+          <strong>{{ item().quantity }}</strong>
+
+          <span>units available</span>
+
+        </div>
+
+
+        <div class="stock-progress">
+
+          <div
+            class="stock-progress-bar"
+            [style.width.%]="
+              Math.min(
+                (item().quantity / item().maxStock) * 100,
+                100
+              )
+            ">
+          </div>
+        </div>
+
+
+        <div class="stock-scale">
+
+          <span>
+            Minimum: {{ item().minStock }}
+          </span>
+
+          <span>
+            Maximum: {{ item().maxStock }}
+          </span>
+
+        </div>
+
+
+        <div class="stock-message">
+
+          @if (item().status === 'IN_STOCK') {
+
+            <mat-icon>check_circle</mat-icon>
+
+            <span>
+              Stock level is healthy.
+            </span>
+
+          } @else if (item().status === 'LOW_STOCK') {
+
+            <mat-icon>warning</mat-icon>
+
+            <span>
+              Stock is below the recommended level.
+            </span>
+
+          } @else {
+
+            <mat-icon>error</mat-icon>
+
+            <span>
+              Inventory is currently out of stock.
+            </span>
+
+          }
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Supplier -->
+
+    <mat-card class="details-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>Supplier Information</h2>
+
+          <p>Current inventory supplier</p>
+
+        </div>
+
+        <mat-icon>business</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+
+      <div class="supplier-section">
+
+        <div class="supplier-icon">
+
+          <mat-icon>business</mat-icon>
+
+        </div>
+
+        <div>
+
+          <strong>{{ item().supplier }}</strong>
+
+          <span>{{ item().supplierId }}</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="supplier-actions">
+
+        <button
+          mat-stroked-button
+          routerLink="/suppliers">
+
+          <mat-icon>visibility</mat-icon>
+          View Supplier
+
+        </button>
+
+
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="createPurchaseRequest()">
+
+          <mat-icon>shopping_cart</mat-icon>
+          Create Purchase Request
+
+        </button>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Zero Trust Security -->
+
+    <mat-card class="details-card security-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>Zero Trust Security Status</h2>
+
+          <p>Security controls associated with this inventory</p>
+
+        </div>
+
+        <mat-icon>security</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+
+      <div class="security-list">
+
+        <div class="security-item">
+
+          <div class="security-icon verified">
+            <mat-icon>verified_user</mat-icon>
+          </div>
+
+          <div>
+
+            <strong>Identity Verification</strong>
+
+            <span>
+              Verified warehouse user
+            </span>
+
+          </div>
+
+          <span class="security-status">
+            VERIFIED
+          </span>
+
+        </div>
+
+
+        <div class="security-item">
+
+          <div class="security-icon trusted">
+            <mat-icon>devices</mat-icon>
+          </div>
+
+          <div>
+
+            <strong>Device Trust</strong>
+
+            <span>
+              Access from trusted device
+            </span>
+
+          </div>
+
+          <span class="security-status">
+            TRUSTED
+          </span>
+
+        </div>
+
+
+        <div class="security-item">
+
+          <div class="security-icon risk">
+            <mat-icon>shield</mat-icon>
+          </div>
+
+          <div>
+
+            <strong>Risk Assessment</strong>
+
+            <span>
+              No abnormal activity detected
+            </span>
+
+          </div>
+
+          <span class="security-status">
+            LOW RISK
+          </span>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Stock Movement -->
+
+  <mat-card class="movement-card">
+
+    <div class="card-header">
+
+      <div>
+
+        <h2>Stock Movement History</h2>
+
+        <p>
+          Track inventory receipts and issues
+        </p>
+
+      </div>
+
+      <mat-icon>history</mat-icon>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="movement-list">
+
+      @for (movement of stockMovements(); track movement.date + movement.reference) {
+
+        <div class="movement-row">
+
+          <div
+            class="movement-icon"
+            [class.received]="movement.type === 'RECEIVED'"
+            [class.issued]="movement.type === 'ISSUED'">
+
+            <mat-icon>
+              {{ getMovementIcon(movement.type) }}
+            </mat-icon>
+
+          </div>
+
+
+          <div class="movement-info">
+
+            <strong>
+              {{ movement.type === 'RECEIVED'
+                ? 'Stock Received'
+                : 'Stock Issued'
+              }}
+            </strong>
+
+            <span>
+              {{ movement.remarks }}
+            </span>
+
+          </div>
+
+
+          <div class="movement-reference">
+
+            <span>Reference</span>
+
+            <strong>
+              {{ movement.reference }}
+            </strong>
+
+          </div>
+
+
+          <div class="movement-user">
+
+            <span>User</span>
+
+            <strong>
+              {{ movement.user }}
+            </strong>
+
+          </div>
+
+
+          <div
+            class="movement-quantity"
+            [class.received]="movement.quantity > 0"
+            [class.issued]="movement.quantity < 0">
+
+            {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
+
+          </div>
+
+
+          <div class="movement-date">
+
+            {{ movement.date }}
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </mat-card>
+
+
+  <!-- Bottom Actions -->
+
+  <div class="bottom-actions">
+
+    <button
+      mat-stroked-button
+      routerLink="/warehouse/inventory">
+
+      <mat-icon>arrow_back</mat-icon>
+      Back to Inventory
+
+    </button>
+
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="adjustStock()">
+
+      <mat-icon>sync_alt</mat-icon>
+      Adjust Stock
+
+    </button>
+
+  </div>
+
+</div>

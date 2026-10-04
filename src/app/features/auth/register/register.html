@@ -1,0 +1,209 @@
+<div class="register-page">
+
+  <mat-card class="register-card">
+
+    <div class="logo-section">
+
+      <mat-icon class="security-icon">
+        security
+      </mat-icon>
+
+      <h1>Zero Trust</h1>
+
+      <p>Supply Chain Security</p>
+
+    </div>
+
+    <h2>Create Account</h2>
+
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="register()">
+
+      <!-- Username -->
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Username</mat-label>
+
+        <input
+          matInput
+          type="text"
+          formControlName="username"
+          autocomplete="username"
+        />
+
+        @if (
+          registerForm.controls.username.touched &&
+          registerForm.controls.username.hasError('required')
+        ) {
+          <mat-error>
+            Username is required
+          </mat-error>
+        }
+
+        @if (
+          registerForm.controls.username.touched &&
+          registerForm.controls.username.hasError('minlength')
+        ) {
+          <mat-error>
+            Username must be at least 3 characters
+          </mat-error>
+        }
+
+      </mat-form-field>
+
+
+      <!-- Password -->
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Password</mat-label>
+
+        <input
+          matInput
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+        />
+
+        @if (
+          registerForm.controls.password.touched &&
+          registerForm.controls.password.hasError('required')
+        ) {
+          <mat-error>
+            Password is required
+          </mat-error>
+        }
+
+        @if (
+          registerForm.controls.password.touched &&
+          registerForm.controls.password.hasError('minlength')
+        ) {
+          <mat-error>
+            Password must be at least 8 characters
+          </mat-error>
+        }
+
+      </mat-form-field>
+
+
+      <!-- Role -->
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Select Role</mat-label>
+
+        <mat-select formControlName="role">
+
+          <mat-option value="PROCUREMENT">
+            Procurement
+          </mat-option>
+
+          <mat-option value="SUPPLIER">
+            Supplier
+          </mat-option>
+
+          <mat-option value="WAREHOUSE">
+            Warehouse
+          </mat-option>
+
+          <mat-option value="FINANCE">
+            Finance
+          </mat-option>
+
+          <mat-option value="AUDITOR">
+            Auditor
+          </mat-option>
+
+          <mat-option value="ADMIN">
+            Admin
+          </mat-option>
+
+        </mat-select>
+
+        @if (
+          registerForm.controls.role.touched &&
+          registerForm.controls.role.hasError('required')
+        ) {
+          <mat-error>
+            Please select a role
+          </mat-error>
+        }
+
+      </mat-form-field>
+
+
+      <!-- Error -->
+
+      @if (errorMessage) {
+
+        <div class="error-message">
+
+          <mat-icon>error</mat-icon>
+
+          <span>
+            {{ errorMessage }}
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- Success -->
+
+      @if (successMessage) {
+
+        <div class="success-message">
+
+          <mat-icon>check_circle</mat-icon>
+
+          <span>
+            {{ successMessage }}
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- Register button -->
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="register-button"
+        [disabled]="loading">
+
+        @if (loading) {
+
+          Creating Account...
+
+        } @else {
+
+          Create Account
+
+        }
+
+      </button>
+
+    </form>
+
+
+    <!-- Login link -->
+
+    <div class="login-link">
+
+      Already have an account?
+
+      <a routerLink="/login">
+        Sign In
+      </a>
+
+    </div>
+
+  </mat-card>
+
+</div>

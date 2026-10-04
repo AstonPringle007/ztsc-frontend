@@ -1,0 +1,271 @@
+<div class="page-container">
+
+  <div class="breadcrumb">
+    <a routerLink="/suppliers">Suppliers</a>
+    <mat-icon>chevron_right</mat-icon>
+    <span>Supplier Details</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1>Supplier Details</h1>
+      <p>Review supplier profile, performance and security risk.</p>
+    </div>
+
+    <div class="header-actions">
+      <button mat-stroked-button routerLink="/suppliers">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+
+      <button mat-raised-button color="primary" (click)="editSupplier()">
+        <mat-icon>edit</mat-icon>
+        Edit Supplier
+      </button>
+    </div>
+  </div>
+
+  <!-- Supplier Profile -->
+  <mat-card class="profile-card">
+    <div class="profile-main">
+      <div class="supplier-avatar">
+        {{ supplier().name.charAt(0) }}
+      </div>
+
+      <div class="profile-info">
+        <div class="name-row">
+          <h2>{{ supplier().name }}</h2>
+          <span class="status-badge"
+                [class.active]="supplier().status === 'ACTIVE'"
+                [class.suspended]="supplier().status === 'SUSPENDED'">
+            {{ supplier().status }}
+          </span>
+        </div>
+
+        <p>{{ supplier().category }} · {{ supplier().id }}</p>
+
+        <div class="profile-location">
+          <mat-icon>location_on</mat-icon>
+          {{ supplier().location }}
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="profile-actions">
+      <button mat-stroked-button (click)="contactSupplier()">
+        <mat-icon>mail</mat-icon>
+        Contact Supplier
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Metrics -->
+  <div class="metrics-grid">
+    <mat-card class="metric-card">
+      <div class="metric-icon blue">
+        <mat-icon>shopping_bag</mat-icon>
+      </div>
+      <div>
+        <span>Total Orders</span>
+        <strong>{{ supplier().totalOrders }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-icon green">
+        <mat-icon>task_alt</mat-icon>
+      </div>
+      <div>
+        <span>Completed Orders</span>
+        <strong>{{ supplier().completedOrders }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-icon orange">
+        <mat-icon>pending_actions</mat-icon>
+      </div>
+      <div>
+        <span>Pending Orders</span>
+        <strong>{{ supplier().pendingOrders }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-icon purple">
+        <mat-icon>payments</mat-icon>
+      </div>
+      <div>
+        <span>Total Order Value</span>
+        <strong>{{ supplier().totalValue | currency:'INR':'symbol':'1.0-0' }}</strong>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="content-grid">
+
+    <!-- Contact Information -->
+    <mat-card class="detail-card">
+      <div class="section-heading">
+        <div class="section-icon">
+          <mat-icon>contact_page</mat-icon>
+        </div>
+        <div>
+          <h2>Contact Information</h2>
+          <p>Supplier communication details</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="detail-list">
+        <div class="detail-item">
+          <span>Contact Person</span>
+          <strong>{{ supplier().contactPerson }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Email Address</span>
+          <strong>{{ supplier().email }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Phone Number</span>
+          <strong>{{ supplier().phone }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Business Address</span>
+          <strong>{{ supplier().address }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Tax Registration</span>
+          <strong>{{ supplier().taxId }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Registered Since</span>
+          <strong>{{ supplier().registrationDate }}</strong>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Risk Assessment -->
+    <mat-card class="detail-card">
+      <div class="section-heading">
+        <div class="section-icon security">
+          <mat-icon>security</mat-icon>
+        </div>
+        <div>
+          <h2>Zero Trust Risk Assessment</h2>
+          <p>Supplier security and trust status</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="risk-overview">
+        <div class="risk-circle"
+             [class.low]="supplier().riskLevel === 'LOW'"
+             [class.medium]="supplier().riskLevel === 'MEDIUM'"
+             [class.high]="supplier().riskLevel === 'HIGH'">
+          <mat-icon>
+            {{ supplier().riskLevel === 'LOW' ? 'verified_user' : 'warning' }}
+          </mat-icon>
+          <strong>{{ supplier().riskLevel }}</strong>
+          <span>Risk Level</span>
+        </div>
+      </div>
+
+      <div class="risk-checks">
+        <div class="risk-check">
+          <mat-icon class="check-icon">check_circle</mat-icon>
+          <div>
+            <strong>Supplier Identity</strong>
+            <span>Registered supplier profile</span>
+          </div>
+        </div>
+
+        <div class="risk-check">
+          <mat-icon class="check-icon">check_circle</mat-icon>
+          <div>
+            <strong>Account Status</strong>
+            <span>{{ supplier().status }}</span>
+          </div>
+        </div>
+
+        <div class="risk-check">
+          <mat-icon [class.warning-icon]="supplier().riskLevel !== 'LOW'"
+                    [class.check-icon]="supplier().riskLevel === 'LOW'">
+            {{ supplier().riskLevel === 'LOW' ? 'check_circle' : 'warning' }}
+          </mat-icon>
+          <div>
+            <strong>Risk Monitoring</strong>
+            <span>
+              {{ supplier().riskLevel === 'LOW'
+                ? 'No elevated risk in mock assessment'
+                : 'Review recommended' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="risk-note">
+        <mat-icon>info</mat-icon>
+        <p>
+          This is sample UI data. Live risk scoring and verification
+          will be connected during backend integration.
+        </p>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Order History -->
+  <mat-card class="orders-card">
+    <div class="orders-heading">
+      <div>
+        <h2>Recent Order History</h2>
+        <p>Recent purchase orders associated with this supplier</p>
+      </div>
+
+      <span class="order-count">{{ orders.length }} orders</span>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Description</th>
+            <th>Order Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (order of orders; track order.id) {
+            <tr>
+              <td><strong>{{ order.id }}</strong></td>
+              <td>{{ order.description }}</td>
+              <td>{{ order.date }}</td>
+              <td>{{ order.amount | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>
+                <span class="order-status"
+                      [class.completed]="order.status === 'COMPLETED'"
+                      [class.processing]="order.status === 'PROCESSING'">
+                  {{ order.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+
+</div>

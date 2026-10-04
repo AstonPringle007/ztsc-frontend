@@ -1,0 +1,455 @@
+<div class="details-page">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="breadcrumb">
+
+        <a routerLink="/finance">
+          Finance
+        </a>
+
+        <mat-icon>chevron_right</mat-icon>
+
+        <a routerLink="/finance/payments">
+          Payments
+        </a>
+
+        <mat-icon>chevron_right</mat-icon>
+
+        <span>{{ payment().id }}</span>
+
+      </div>
+
+      <div class="title-row">
+
+        <div>
+          <h1>{{ payment().invoiceNumber }}</h1>
+
+          <p>
+            Payment {{ payment().id }}
+            • Purchase Request {{ payment().purchaseRequest }}
+          </p>
+        </div>
+
+        <div
+          class="status"
+          [class.pending]="payment().status === 'PENDING'"
+          [class.approved]="payment().status === 'APPROVED'"
+          [class.completed]="payment().status === 'COMPLETED'"
+          [class.rejected]="payment().status === 'REJECTED'">
+
+          <mat-icon>
+            {{ getStatusIcon(payment().status) }}
+          </mat-icon>
+
+          {{ payment().status }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <button
+      mat-stroked-button
+      (click)="backToPayments()">
+
+      <mat-icon>arrow_back</mat-icon>
+
+      Back to Payments
+
+    </button>
+
+  </div>
+
+
+  <!-- Main Grid -->
+
+  <div class="main-grid">
+
+    <!-- Payment Information -->
+
+    <mat-card class="card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>Payment Information</h2>
+          <p>Transaction details</p>
+        </div>
+
+        <mat-icon>payments</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="info-grid">
+
+        <div class="info-item">
+
+          <span>Payment ID</span>
+
+          <strong>{{ payment().id }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Invoice Number</span>
+
+          <strong>{{ payment().invoiceNumber }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Purchase Request</span>
+
+          <strong>{{ payment().purchaseRequest }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Payment Method</span>
+
+          <strong>{{ payment().paymentMethod }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Created Date</span>
+
+          <strong>{{ payment().createdDate }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Due Date</span>
+
+          <strong>{{ payment().dueDate }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Approved Date</span>
+
+          <strong>{{ payment().approvedDate }}</strong>
+
+        </div>
+
+        <div class="info-item">
+
+          <span>Supplier ID</span>
+
+          <strong>{{ payment().supplierId }}</strong>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Amount -->
+
+    <mat-card class="amount-card">
+
+      <div class="amount-header">
+
+        <div>
+          <h2>Payment Amount</h2>
+          <p>Total transaction value</p>
+        </div>
+
+        <mat-icon>account_balance_wallet</mat-icon>
+
+      </div>
+
+      <div class="amount-total">
+        {{ formatCurrency(payment().totalAmount) }}
+      </div>
+
+      <div class="amount-breakdown">
+
+        <div>
+          <span>Base Amount</span>
+          <strong>{{ formatCurrency(payment().amount) }}</strong>
+        </div>
+
+        <div>
+          <span>Tax / GST</span>
+          <strong>{{ formatCurrency(payment().taxAmount) }}</strong>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="total-row">
+          <span>Total</span>
+          <strong>{{ formatCurrency(payment().totalAmount) }}</strong>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Supplier + Security -->
+
+  <div class="main-grid">
+
+    <!-- Supplier -->
+
+    <mat-card class="card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>Supplier Information</h2>
+          <p>Payment recipient</p>
+        </div>
+
+        <mat-icon>business</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="supplier-info">
+
+        <div class="supplier-avatar">
+          <mat-icon>business</mat-icon>
+        </div>
+
+        <div class="supplier-details">
+
+          <h3>{{ payment().supplier }}</h3>
+
+          <span>{{ payment().supplierId }}</span>
+
+          <a routerLink="/suppliers/details/SUP-1001">
+            View Supplier Profile
+            <mat-icon>open_in_new</mat-icon>
+          </a>
+
+        </div>
+
+      </div>
+
+      <div class="description">
+
+        <span>Description</span>
+
+        <p>
+          {{ payment().description }}
+        </p>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Zero Trust Security -->
+
+    <mat-card class="security-card">
+
+      <div class="security-header">
+
+        <div>
+          <h2>Zero Trust Security</h2>
+          <p>Payment security verification</p>
+        </div>
+
+        <mat-icon>security</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="security-status">
+
+        <div class="security-check">
+
+          <mat-icon>verified_user</mat-icon>
+
+          <div>
+            <strong>Identity Verified</strong>
+            <span>Finance user authenticated</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-check">
+
+          <mat-icon>devices</mat-icon>
+
+          <div>
+            <strong>Trusted Device</strong>
+            <span>Device trust verified</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-check">
+
+          <mat-icon>shield</mat-icon>
+
+          <div>
+            <strong>Risk Level: {{ payment().riskLevel }}</strong>
+            <span>No significant anomaly detected</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-check">
+
+          <mat-icon>policy</mat-icon>
+
+          <div>
+            <strong>Policy Compliant</strong>
+            <span>Payment follows security policy</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Timeline -->
+
+  <mat-card class="timeline-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Payment Approval Timeline</h2>
+        <p>Zero Trust approval workflow</p>
+      </div>
+
+      <mat-icon>timeline</mat-icon>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="timeline">
+
+      @for (event of timeline(); track event.title) {
+
+        <div
+          class="timeline-item"
+          [class.completed]="event.completed">
+
+          <div class="timeline-icon">
+
+            <mat-icon>
+              {{ event.icon }}
+            </mat-icon>
+
+          </div>
+
+          <div class="timeline-content">
+
+            <div class="timeline-title">
+
+              <strong>{{ event.title }}</strong>
+
+              <span>{{ event.date }}</span>
+
+            </div>
+
+            <p>{{ event.description }}</p>
+
+            <small>
+              {{ event.user }}
+            </small>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </mat-card>
+
+
+  <!-- Actions -->
+
+  <div class="actions">
+
+    <button
+      mat-stroked-button
+      (click)="backToPayments()">
+
+      <mat-icon>arrow_back</mat-icon>
+
+      Back
+
+    </button>
+
+
+    @if (payment().status === 'PENDING') {
+
+      <button
+        mat-stroked-button
+        class="reject-button"
+        (click)="rejectPayment()">
+
+        <mat-icon>close</mat-icon>
+
+        Reject Payment
+
+      </button>
+
+      <button
+        mat-flat-button
+        class="approve-button"
+        (click)="approvePayment()">
+
+        <mat-icon>check</mat-icon>
+
+        Approve Payment
+
+      </button>
+
+    }
+
+
+    @if (payment().status === 'APPROVED') {
+
+      <button
+        mat-flat-button
+        class="process-button"
+        (click)="processPayment()">
+
+        <mat-icon>account_balance</mat-icon>
+
+        Process Payment
+
+      </button>
+
+    }
+
+  </div>
+
+</div>

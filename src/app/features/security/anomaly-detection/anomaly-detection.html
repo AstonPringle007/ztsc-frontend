@@ -1,0 +1,462 @@
+<div class="page-container">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>AI Anomaly Detection</h1>
+
+      <p>
+        Machine-learning based behavioral analysis and
+        suspicious activity detection
+      </p>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="isScanning()"
+      (click)="runScan()">
+
+      <mat-icon>
+        {{ isScanning() ? 'sync' : 'psychology' }}
+      </mat-icon>
+
+      {{ isScanning() ? 'Scanning...' : 'Run AI Scan' }}
+
+    </button>
+
+  </div>
+
+  <!-- AI Status -->
+
+  <mat-card class="ai-status-card">
+
+    <div class="ai-status-icon">
+      <mat-icon>psychology</mat-icon>
+    </div>
+
+    <div class="ai-status-content">
+
+      <div class="status-title">
+        <strong>AI Anomaly Detection Engine</strong>
+
+        <span class="active-badge">
+          ACTIVE
+        </span>
+      </div>
+
+      <p>
+        Isolation Forest behavioral analysis is monitoring
+        users, devices, requests and network activity.
+      </p>
+
+      <div class="scan-info">
+        Last scan:
+        <strong>{{ lastScan() }}</strong>
+      </div>
+
+    </div>
+
+    <div class="algorithm-box">
+      <span>Detection Algorithm</span>
+      <strong>Isolation Forest</strong>
+    </div>
+
+  </mat-card>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+
+      <div class="stat-icon">
+        <mat-icon>analytics</mat-icon>
+      </div>
+
+      <div>
+        <span>Activities Analyzed</span>
+        <strong>{{ totalAnalyzed() | number }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card danger">
+
+      <div class="stat-icon">
+        <mat-icon>warning</mat-icon>
+      </div>
+
+      <div>
+        <span>Detected Anomalies</span>
+        <strong>{{ detectedAnomalies() }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card critical">
+
+      <div class="stat-icon">
+        <mat-icon>gpp_maybe</mat-icon>
+      </div>
+
+      <div>
+        <span>High Risk</span>
+        <strong>{{ highRiskAnomalies() }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card success">
+
+      <div class="stat-icon">
+        <mat-icon>verified</mat-icon>
+      </div>
+
+      <div>
+        <span>Confirmed</span>
+        <strong>{{ confirmedAnomalies() }}</strong>
+      </div>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Detection Score -->
+
+  <div class="analysis-grid">
+
+    <mat-card class="score-card">
+
+      <h2>Average Anomaly Score</h2>
+
+      <div class="score-circle">
+
+        <strong>
+          {{ averageAnomalyScore() }}
+        </strong>
+
+        <span>/ 100</span>
+
+      </div>
+
+      <div class="score-scale">
+
+        <span>Normal</span>
+
+        <mat-progress-bar
+          mode="determinate"
+          [value]="averageAnomalyScore()">
+        </mat-progress-bar>
+
+        <span>Suspicious</span>
+
+      </div>
+
+      <p>
+        Higher scores indicate activity that differs
+        significantly from the established behavioral baseline.
+      </p>
+
+    </mat-card>
+
+    <mat-card class="model-card">
+
+      <div class="model-header">
+        <mat-icon>model_training</mat-icon>
+
+        <div>
+          <h2>Detection Model</h2>
+          <span>Behavioral baseline</span>
+        </div>
+      </div>
+
+      <div class="model-item">
+        <span>Users monitored</span>
+        <strong>48</strong>
+      </div>
+
+      <div class="model-item">
+        <span>Devices monitored</span>
+        <strong>24</strong>
+      </div>
+
+      <div class="model-item">
+        <span>Network events</span>
+        <strong>1,248</strong>
+      </div>
+
+      <div class="model-item">
+        <span>False positives</span>
+        <strong>{{ falsePositives() }}</strong>
+      </div>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Anomaly table -->
+
+  <mat-card class="table-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Detected Anomalies</h2>
+
+        <p>
+          Behavioral deviations identified by the AI engine
+        </p>
+      </div>
+
+      <div class="zero-trust-label">
+        <mat-icon>shield</mat-icon>
+        AI + Zero Trust
+      </div>
+
+    </div>
+
+    <div class="table-wrapper">
+
+      <table mat-table [dataSource]="anomalies()">
+
+        <!-- ID -->
+
+        <ng-container matColumnDef="id">
+
+          <th mat-header-cell *matHeaderCellDef>
+            ID
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <strong>{{ anomaly.id }}</strong>
+
+          </td>
+
+        </ng-container>
+
+        <!-- User -->
+
+        <ng-container matColumnDef="user">
+
+          <th mat-header-cell *matHeaderCellDef>
+            User / Device
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <div class="user-cell">
+
+              <strong>{{ anomaly.user }}</strong>
+
+              <span>{{ anomaly.device }}</span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Activity -->
+
+        <ng-container matColumnDef="activity">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Activity
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <div class="activity-cell">
+
+              <strong>
+                {{ anomaly.activity }}
+              </strong>
+
+              <span>
+                {{ anomaly.indicator }}
+              </span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Score -->
+
+        <ng-container matColumnDef="score">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Anomaly Score
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <div class="score-cell">
+
+              <strong
+                [class]="getScoreClass(anomaly.anomalyScore)">
+
+                {{ anomaly.anomalyScore }}
+
+              </strong>
+
+              <mat-progress-bar
+                mode="determinate"
+                [value]="anomaly.anomalyScore">
+              </mat-progress-bar>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Risk -->
+
+        <ng-container matColumnDef="risk">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Risk
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <span
+              class="risk-badge"
+              [ngClass]="getRiskClass(anomaly.risk)">
+
+              {{ anomaly.risk }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Status -->
+
+        <ng-container matColumnDef="status">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Status
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <span
+              class="status-badge"
+              [ngClass]="getStatusClass(anomaly.status)">
+
+              {{ anomaly.status.replace('_', ' ') }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Timestamp -->
+
+        <ng-container matColumnDef="timestamp">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Detected
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            {{ anomaly.timestamp }}
+
+          </td>
+
+        </ng-container>
+
+        <!-- Actions -->
+
+        <ng-container matColumnDef="actions">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Actions
+          </th>
+
+          <td mat-cell *matCellDef="let anomaly">
+
+            <button
+              mat-icon-button
+              color="primary"
+              title="Review"
+              (click)="reviewAnomaly(anomaly)">
+
+              <mat-icon>
+                manage_search
+              </mat-icon>
+
+            </button>
+
+            <button
+              mat-icon-button
+              color="primary"
+              title="Confirm anomaly"
+              (click)="confirmAnomaly(anomaly)">
+
+              <mat-icon>
+                check_circle
+              </mat-icon>
+
+            </button>
+
+            <button
+              mat-icon-button
+              title="False positive"
+              (click)="markFalsePositive(anomaly)">
+
+              <mat-icon>
+                cancel
+              </mat-icon>
+
+            </button>
+
+          </td>
+
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="[
+            'id',
+            'user',
+            'activity',
+            'score',
+            'risk',
+            'status',
+            'timestamp',
+            'actions'
+          ]">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: [
+            'id',
+            'user',
+            'activity',
+            'score',
+            'risk',
+            'status',
+            'timestamp',
+            'actions'
+          ]">
+        </tr>
+
+      </table>
+
+    </div>
+
+  </mat-card>
+
+</div>

@@ -1,0 +1,356 @@
+<div class="warehouse-dashboard">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        Dashboard / Warehouse
+      </div>
+
+      <h1>Inventory Dashboard</h1>
+
+      <p>
+        Monitor inventory levels, stock availability and warehouse activity.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        mat-stroked-button
+        color="primary"
+        routerLink="/warehouse/inventory">
+        <mat-icon>inventory_2</mat-icon>
+        View Inventory
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+
+    <mat-card class="summary-card">
+      <div class="card-icon blue">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span>Total Items</span>
+        <strong>{{ totalItems() }}</strong>
+        <small>Inventory products</small>
+      </div>
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+      <div class="card-icon green">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span>In Stock</span>
+        <strong>{{ inStockItems() }}</strong>
+        <small>Healthy stock levels</small>
+      </div>
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+      <div class="card-icon orange">
+        <mat-icon>warning</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span>Low Stock</span>
+        <strong>{{ lowStockItems() }}</strong>
+        <small>Needs attention</small>
+      </div>
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+      <div class="card-icon red">
+        <mat-icon>error</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span>Out of Stock</span>
+        <strong>{{ outOfStockItems() }}</strong>
+        <small>Immediate action required</small>
+      </div>
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+      <div class="card-icon purple">
+        <mat-icon>payments</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span>Inventory Value</span>
+        <strong>₹{{ inventoryValue() | number }}</strong>
+        <small>Total stock value</small>
+      </div>
+    </mat-card>
+
+  </div>
+
+
+  <!-- Main Grid -->
+  <div class="content-grid">
+
+    <!-- Stock Overview -->
+    <mat-card class="dashboard-card">
+
+      <div class="card-header">
+        <div>
+          <h2>Stock Overview</h2>
+          <p>Current inventory distribution</p>
+        </div>
+
+        <mat-icon>bar_chart</mat-icon>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="stock-overview">
+
+        <div class="stock-row">
+          <div class="stock-info">
+            <span class="dot green-dot"></span>
+            <span>In Stock</span>
+          </div>
+
+          <strong>{{ inStockItems() }}</strong>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-bar green-bar"
+            [style.width.%]="(inStockItems() / totalItems()) * 100">
+          </div>
+        </div>
+
+
+        <div class="stock-row">
+          <div class="stock-info">
+            <span class="dot orange-dot"></span>
+            <span>Low Stock</span>
+          </div>
+
+          <strong>{{ lowStockItems() }}</strong>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-bar orange-bar"
+            [style.width.%]="(lowStockItems() / totalItems()) * 100">
+          </div>
+        </div>
+
+
+        <div class="stock-row">
+          <div class="stock-info">
+            <span class="dot red-dot"></span>
+            <span>Out of Stock</span>
+          </div>
+
+          <strong>{{ outOfStockItems() }}</strong>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-bar red-bar"
+            [style.width.%]="(outOfStockItems() / totalItems()) * 100">
+          </div>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Low Stock Alerts -->
+    <mat-card class="dashboard-card">
+
+      <div class="card-header">
+        <div>
+          <h2>Low Stock Alerts</h2>
+          <p>Items requiring replenishment</p>
+        </div>
+
+        <mat-icon class="warning-icon">warning</mat-icon>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      @if (lowStockAlerts().length > 0) {
+
+        <div class="alert-list">
+
+          @for (item of lowStockAlerts(); track item.id) {
+
+            <div class="alert-item">
+
+              <div class="alert-icon">
+                <mat-icon>inventory_2</mat-icon>
+              </div>
+
+              <div class="alert-details">
+                <strong>{{ item.name }}</strong>
+
+                <span>
+                  {{ item.quantity }} units remaining
+                  · Minimum {{ item.minStock }}
+                </span>
+              </div>
+
+              <button
+                mat-icon-button
+                color="primary"
+                [routerLink]="['/warehouse/inventory', item.id]"
+                matTooltip="View item">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+
+            </div>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>All inventory levels are healthy.</p>
+        </div>
+
+      }
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Recent Inventory -->
+  <mat-card class="dashboard-card recent-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Recent Inventory Updates</h2>
+        <p>Latest warehouse inventory activity</p>
+      </div>
+
+      <button
+        mat-button
+        color="primary"
+        routerLink="/warehouse/inventory">
+        View All
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="inventory-list">
+
+      @for (item of recentItems(); track item.id) {
+
+        <div class="inventory-row">
+
+          <div class="inventory-main">
+
+            <div class="inventory-icon">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+
+            <div>
+              <strong>{{ item.name }}</strong>
+
+              <span>
+                {{ item.id }} · {{ item.location }}
+              </span>
+            </div>
+
+          </div>
+
+
+          <div class="inventory-category">
+            {{ item.category }}
+          </div>
+
+
+          <div class="inventory-quantity">
+            <strong>{{ item.quantity }}</strong>
+            <span>units</span>
+          </div>
+
+
+          <div
+            class="status-badge"
+            [class.in-stock]="item.status === 'IN_STOCK'"
+            [class.low-stock]="item.status === 'LOW_STOCK'"
+            [class.out-of-stock]="item.status === 'OUT_OF_STOCK'">
+
+            <mat-icon>{{ getStatusIcon(item.status) }}</mat-icon>
+
+            {{ getStatusLabel(item.status) }}
+
+          </div>
+
+
+          <div class="updated-date">
+            {{ item.lastUpdated }}
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </mat-card>
+
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+
+    <button
+      mat-raised-button
+      color="primary"
+      routerLink="/warehouse/inventory">
+
+      <mat-icon>inventory</mat-icon>
+      Manage Inventory
+
+    </button>
+
+
+    <button
+      mat-stroked-button
+      color="primary"
+      routerLink="/warehouse/inventory">
+
+      <mat-icon>add_box</mat-icon>
+      Add Stock
+
+    </button>
+
+
+    <button
+      mat-stroked-button
+      color="primary"
+      routerLink="/warehouse/inventory">
+
+      <mat-icon>local_shipping</mat-icon>
+      Purchase Orders
+
+    </button>
+
+  </div>
+
+</div>

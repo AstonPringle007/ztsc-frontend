@@ -1,0 +1,313 @@
+<div class="users-page">
+
+  <div class="page-header">
+
+    <div>
+      <div class="eyebrow">
+        <mat-icon>manage_accounts</mat-icon>
+        USER ADMINISTRATION
+      </div>
+
+      <h1>User Management</h1>
+
+      <p>
+        Manage system users, roles, access and account status.
+      </p>
+    </div>
+
+    <button mat-flat-button color="primary">
+      <mat-icon>person_add</mat-icon>
+      Add User
+    </button>
+
+  </div>
+
+  <div class="security-banner">
+
+    <mat-icon>verified_user</mat-icon>
+
+    <div>
+      <strong>Zero Trust User Management</strong>
+      <span>
+        Every user is evaluated using identity, role, device trust and risk.
+      </span>
+    </div>
+
+  </div>
+
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>people</mat-icon>
+      </div>
+
+      <div>
+        <span>Total Users</span>
+        <strong>{{ totalUsers() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>person</mat-icon>
+      </div>
+
+      <div>
+        <span>Active Users</span>
+        <strong>{{ activeUsers() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>person_off</mat-icon>
+      </div>
+
+      <div>
+        <span>Inactive Users</span>
+        <strong>{{ inactiveUsers() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <div class="stat-icon">
+        <mat-icon>warning</mat-icon>
+      </div>
+
+      <div>
+        <span>High Risk</span>
+        <strong>{{ highRiskUsers() }}</strong>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <mat-card class="main-card">
+
+    <div class="filters">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Search users</mat-label>
+
+        <input
+          matInput
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          placeholder="Name, email or user ID">
+
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+
+        <mat-select
+          [ngModel]="selectedRole()"
+          (ngModelChange)="selectedRole.set($event)">
+
+          <mat-option value="ALL">All Roles</mat-option>
+          <mat-option value="ADMIN">Admin</mat-option>
+          <mat-option value="PROCUREMENT">Procurement</mat-option>
+          <mat-option value="SUPPLIER">Supplier</mat-option>
+          <mat-option value="WAREHOUSE">Warehouse</mat-option>
+          <mat-option value="FINANCE">Finance</mat-option>
+          <mat-option value="AUDITOR">Auditor</mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+
+        <mat-select
+          [ngModel]="selectedStatus()"
+          (ngModelChange)="selectedStatus.set($event)">
+
+          <mat-option value="ALL">All Status</mat-option>
+          <mat-option value="ACTIVE">Active</mat-option>
+          <mat-option value="INACTIVE">Inactive</mat-option>
+          <mat-option value="SUSPENDED">Suspended</mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-stroked-button
+        (click)="clearFilters()">
+
+        <mat-icon>filter_alt_off</mat-icon>
+        Clear
+
+      </button>
+
+    </div>
+
+    <div class="table-header">
+      <div>
+        <h2>System Users</h2>
+        <span>{{ filteredUsers().length }} users found</span>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Devices</th>
+            <th>Risk</th>
+            <th>Last Login</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (user of filteredUsers(); track user.id) {
+
+            <tr>
+
+              <td>
+                <div class="user-cell">
+
+                  <div class="avatar">
+                    {{ user.username.charAt(0) }}
+                  </div>
+
+                  <div>
+                    <strong>{{ user.username }}</strong>
+                    <span>{{ user.email }}</span>
+                    <small>{{ user.id }}</small>
+                  </div>
+
+                </div>
+              </td>
+
+              <td>
+
+                <mat-form-field
+                  appearance="outline"
+                  class="role-select">
+
+                  <mat-select
+                    [value]="user.role"
+                    (selectionChange)="changeRole(user, $event.value)">
+
+                    <mat-option value="ADMIN">ADMIN</mat-option>
+                    <mat-option value="PROCUREMENT">PROCUREMENT</mat-option>
+                    <mat-option value="SUPPLIER">SUPPLIER</mat-option>
+                    <mat-option value="WAREHOUSE">WAREHOUSE</mat-option>
+                    <mat-option value="FINANCE">FINANCE</mat-option>
+                    <mat-option value="AUDITOR">AUDITOR</mat-option>
+
+                  </mat-select>
+
+                </mat-form-field>
+
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class]="getStatusClass(user.status)">
+
+                  <span class="dot"></span>
+                  {{ user.status }}
+
+                </span>
+              </td>
+
+              <td>
+                <div class="device-count">
+                  <mat-icon>devices</mat-icon>
+                  {{ user.deviceCount }}
+                </div>
+              </td>
+
+              <td>
+                <span
+                  class="risk-badge"
+                  [class]="getRiskClass(user.risk)">
+                  {{ user.risk }}
+                </span>
+              </td>
+
+              <td>
+                <span class="last-login">
+                  {{ user.lastLogin }}
+                </span>
+              </td>
+
+              <td>
+
+                <div class="actions">
+
+                  @if (user.status !== 'ACTIVE') {
+                    <button
+                      mat-icon-button
+                      matTooltip="Activate"
+                      (click)="activateUser(user)">
+
+                      <mat-icon>check_circle</mat-icon>
+
+                    </button>
+                  }
+
+                  @if (user.status === 'ACTIVE') {
+                    <button
+                      mat-icon-button
+                      matTooltip="Deactivate"
+                      (click)="deactivateUser(user)">
+
+                      <mat-icon>block</mat-icon>
+
+                    </button>
+                  }
+
+                  @if (user.status !== 'SUSPENDED') {
+                    <button
+                      mat-icon-button
+                      matTooltip="Suspend"
+                      (click)="suspendUser(user)">
+
+                      <mat-icon>person_off</mat-icon>
+
+                    </button>
+                  }
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          } @empty {
+
+            <tr>
+              <td colspan="7">
+
+                <div class="empty-state">
+                  <mat-icon>person_search</mat-icon>
+                  <h3>No users found</h3>
+                  <p>Try changing your search or filters.</p>
+                </div>
+
+              </td>
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </mat-card>
+
+</div>

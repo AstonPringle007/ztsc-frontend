@@ -1,0 +1,468 @@
+<div class="page-container">
+
+  <!-- Header -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Audit Logs</h1>
+
+      <p>
+        Immutable-style security activity and compliance trail
+      </p>
+    </div>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="exportLogs()">
+
+      <mat-icon>download</mat-icon>
+
+      Export Logs
+
+    </button>
+
+  </div>
+
+  <!-- Audit integrity banner -->
+
+  <mat-card class="integrity-card">
+
+    <div class="integrity-icon">
+      <mat-icon>verified</mat-icon>
+    </div>
+
+    <div class="integrity-content">
+
+      <strong>Audit Trail Protected</strong>
+
+      <p>
+        Security-sensitive activities are recorded with actor,
+        device, IP address, timestamp and result for complete
+        traceability.
+      </p>
+
+    </div>
+
+    <div class="integrity-status">
+      <mat-icon>lock</mat-icon>
+      Integrity Protected
+    </div>
+
+  </mat-card>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+
+      <div class="stat-icon">
+        <mat-icon>history</mat-icon>
+      </div>
+
+      <div>
+        <span>Total Logs</span>
+        <strong>{{ totalLogs() }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card success">
+
+      <div class="stat-icon">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+
+      <div>
+        <span>Successful</span>
+        <strong>{{ successfulLogs() }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+
+      <div class="stat-icon">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+
+      <div>
+        <span>Failed</span>
+        <strong>{{ failedLogs() }}</strong>
+      </div>
+
+    </mat-card>
+
+    <mat-card class="stat-card danger">
+
+      <div class="stat-icon">
+        <mat-icon>block</mat-icon>
+      </div>
+
+      <div>
+        <span>Blocked</span>
+        <strong>{{ blockedLogs() }}</strong>
+      </div>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Filters -->
+
+  <mat-card class="filter-card">
+
+    <div class="filter-row">
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Search audit logs</mat-label>
+
+        <input
+          matInput
+          placeholder="Actor, action, resource or IP"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+
+        <mat-icon matSuffix>
+          search
+        </mat-icon>
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Result</mat-label>
+
+        <mat-select
+          [ngModel]="resultFilter()"
+          (ngModelChange)="resultFilter.set($event)">
+
+          <mat-option value="ALL">
+            All Results
+          </mat-option>
+
+          <mat-option value="SUCCESS">
+            Success
+          </mat-option>
+
+          <mat-option value="FAILED">
+            Failed
+          </mat-option>
+
+          <mat-option value="BLOCKED">
+            Blocked
+          </mat-option>
+
+        </mat-select>
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+
+        <mat-label>Severity</mat-label>
+
+        <mat-select
+          [ngModel]="severityFilter()"
+          (ngModelChange)="severityFilter.set($event)">
+
+          <mat-option value="ALL">
+            All Severities
+          </mat-option>
+
+          <mat-option value="LOW">
+            Low
+          </mat-option>
+
+          <mat-option value="MEDIUM">
+            Medium
+          </mat-option>
+
+          <mat-option value="HIGH">
+            High
+          </mat-option>
+
+          <mat-option value="CRITICAL">
+            Critical
+          </mat-option>
+
+        </mat-select>
+
+      </mat-form-field>
+
+    </div>
+
+  </mat-card>
+
+  <!-- Audit table -->
+
+  <mat-card class="table-card">
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>Security Audit Trail</h2>
+
+        <p>
+          {{ filteredLogs().length }} record(s) displayed
+        </p>
+
+      </div>
+
+      <div class="zero-trust-label">
+
+        <mat-icon>shield</mat-icon>
+
+        Zero Trust Accountability
+
+      </div>
+
+    </div>
+
+    <div class="table-wrapper">
+
+      <table mat-table [dataSource]="filteredLogs()">
+
+        <!-- ID -->
+
+        <ng-container matColumnDef="id">
+
+          <th mat-header-cell *matHeaderCellDef>
+            ID
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <strong>{{ log.id }}</strong>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Timestamp -->
+
+        <ng-container matColumnDef="timestamp">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Timestamp
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            {{ log.timestamp }}
+
+          </td>
+
+        </ng-container>
+
+        <!-- Actor -->
+
+        <ng-container matColumnDef="actor">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Actor
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <div class="actor-cell">
+
+              <div class="actor-icon">
+
+                <mat-icon>
+                  person
+                </mat-icon>
+
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ log.actor }}
+                </strong>
+
+                <span>
+                  {{ log.role }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Action -->
+
+        <ng-container matColumnDef="action">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Action
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <div class="action-cell">
+
+              <mat-icon>
+                {{ getActionIcon(log.action) }}
+              </mat-icon>
+
+              <strong>
+                {{ log.action.replace('_', ' ') }}
+              </strong>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Resource -->
+
+        <ng-container matColumnDef="resource">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Resource
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <div class="resource-cell">
+
+              <strong>
+                {{ log.resource }}
+              </strong>
+
+              <span>
+                {{ log.resourceId }}
+              </span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Network -->
+
+        <ng-container matColumnDef="network">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Network
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <div class="network-cell">
+
+              <code>
+                {{ log.ipAddress }}
+              </code>
+
+              <span>
+                {{ log.device }}
+              </span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Result -->
+
+        <ng-container matColumnDef="result">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Result
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <span
+              class="result-badge"
+              [ngClass]="getResultClass(log.result)">
+
+              <mat-icon>
+
+                {{
+                  log.result === 'SUCCESS'
+                    ? 'check'
+                    : log.result === 'BLOCKED'
+                      ? 'block'
+                      : 'close'
+                }}
+
+              </mat-icon>
+
+              {{ log.result }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Severity -->
+
+        <ng-container matColumnDef="severity">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Severity
+          </th>
+
+          <td mat-cell *matCellDef="let log">
+
+            <span
+              class="severity-badge"
+              [ngClass]="getSeverityClass(log.severity)">
+
+              {{ log.severity }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="[
+            'id',
+            'timestamp',
+            'actor',
+            'action',
+            'resource',
+            'network',
+            'result',
+            'severity'
+          ]">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: [
+            'id',
+            'timestamp',
+            'actor',
+            'action',
+            'resource',
+            'network',
+            'result',
+            'severity'
+          ]">
+        </tr>
+
+      </table>
+
+    </div>
+
+  </mat-card>
+
+</div>

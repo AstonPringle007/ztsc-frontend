@@ -1,0 +1,390 @@
+<div class="create-page">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Create Purchase Request</h1>
+
+      <p>
+        Submit a new request for procurement approval.
+      </p>
+    </div>
+
+    <button
+      mat-stroked-button
+      routerLink="/procurement">
+
+      <mat-icon>arrow_back</mat-icon>
+
+      Back to Requests
+
+    </button>
+
+  </div>
+
+
+  @if (submitted) {
+
+    <div class="success-message">
+
+      <mat-icon>check_circle</mat-icon>
+
+      <div>
+        <strong>Purchase request submitted successfully.</strong>
+        <div>Returning to purchase requests...</div>
+      </div>
+
+    </div>
+
+  }
+
+
+  <mat-card class="form-card">
+
+    <div class="form-title">
+
+      <div class="form-icon">
+        <mat-icon>shopping_cart</mat-icon>
+      </div>
+
+      <div>
+        <h2>Request Information</h2>
+        <p>Enter the details for your procurement request.</p>
+      </div>
+
+    </div>
+
+
+    <form
+      [formGroup]="requestForm"
+      (ngSubmit)="submitRequest()">
+
+
+      <!-- TITLE -->
+
+      <div class="form-row">
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Request Title</mat-label>
+
+          <input
+            matInput
+            formControlName="title"
+            placeholder="e.g. Laptop Equipment">
+
+          @if (
+            requestForm.controls.title.touched &&
+            requestForm.controls.title.hasError('required')
+          ) {
+            <mat-error>
+              Request title is required
+            </mat-error>
+          }
+
+          @if (
+            requestForm.controls.title.touched &&
+            requestForm.controls.title.hasError('minlength')
+          ) {
+            <mat-error>
+              Title must be at least 3 characters
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+
+        <!-- CATEGORY -->
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Category</mat-label>
+
+          <mat-select formControlName="category">
+
+            <mat-option value="IT_EQUIPMENT">
+              IT Equipment
+            </mat-option>
+
+            <mat-option value="OFFICE_SUPPLIES">
+              Office Supplies
+            </mat-option>
+
+            <mat-option value="WAREHOUSE">
+              Warehouse Equipment
+            </mat-option>
+
+            <mat-option value="SECURITY">
+              Security Equipment
+            </mat-option>
+
+            <mat-option value="INFRASTRUCTURE">
+              Infrastructure
+            </mat-option>
+
+            <mat-option value="OTHER">
+              Other
+            </mat-option>
+
+          </mat-select>
+
+          @if (
+            requestForm.controls.category.touched &&
+            requestForm.controls.category.hasError('required')
+          ) {
+            <mat-error>
+              Category is required
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <mat-form-field
+        appearance="outline"
+        class="full-width">
+
+        <mat-label>Description</mat-label>
+
+        <textarea
+          matInput
+          rows="4"
+          formControlName="description"
+          placeholder="Describe what you need and why...">
+        </textarea>
+
+        @if (
+          requestForm.controls.description.touched &&
+          requestForm.controls.description.hasError('required')
+        ) {
+          <mat-error>
+            Description is required
+          </mat-error>
+        }
+
+        @if (
+          requestForm.controls.description.touched &&
+          requestForm.controls.description.hasError('minlength')
+        ) {
+          <mat-error>
+            Description must be at least 10 characters
+          </mat-error>
+        }
+
+      </mat-form-field>
+
+
+      <!-- SUPPLIER / QUANTITY -->
+
+      <div class="form-row">
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Supplier</mat-label>
+
+          <mat-select formControlName="supplier">
+
+            <mat-option value="TECH_SOLUTIONS">
+              Tech Solutions Ltd
+            </mat-option>
+
+            <mat-option value="SECURETECH">
+              SecureTech
+            </mat-option>
+
+            <mat-option value="INDUSTRIAL_SYSTEMS">
+              Industrial Systems
+            </mat-option>
+
+            <mat-option value="OFFICE_WORLD">
+              Office World
+            </mat-option>
+
+            <mat-option value="WAREHOUSE_PRO">
+              Warehouse Pro
+            </mat-option>
+
+            <mat-option value="CLOUD_SYSTEMS">
+              Cloud Systems
+            </mat-option>
+
+          </mat-select>
+
+          @if (
+            requestForm.controls.supplier.touched &&
+            requestForm.controls.supplier.hasError('required')
+          ) {
+            <mat-error>
+              Supplier is required
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Quantity</mat-label>
+
+          <input
+            matInput
+            type="number"
+            formControlName="quantity">
+
+          @if (
+            requestForm.controls.quantity.touched &&
+            requestForm.controls.quantity.hasError('min')
+          ) {
+            <mat-error>
+              Quantity must be at least 1
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+      </div>
+
+
+      <!-- AMOUNT / PRIORITY / DATE -->
+
+      <div class="form-row three-columns">
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Estimated Amount</mat-label>
+
+          <span matTextPrefix>₹&nbsp;</span>
+
+          <input
+            matInput
+            type="number"
+            formControlName="estimatedAmount">
+
+          @if (
+            requestForm.controls.estimatedAmount.touched &&
+            requestForm.controls.estimatedAmount.hasError('min')
+          ) {
+            <mat-error>
+              Amount must be greater than 0
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Priority</mat-label>
+
+          <mat-select formControlName="priority">
+
+            <mat-option value="LOW">
+              Low
+            </mat-option>
+
+            <mat-option value="MEDIUM">
+              Medium
+            </mat-option>
+
+            <mat-option value="HIGH">
+              High
+            </mat-option>
+
+          </mat-select>
+
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline">
+
+          <mat-label>Required Date</mat-label>
+
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="requiredDate">
+
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker">
+          </mat-datepicker-toggle>
+
+          <mat-datepicker #picker></mat-datepicker>
+
+          @if (
+            requestForm.controls.requiredDate.touched &&
+            requestForm.controls.requiredDate.hasError('required')
+          ) {
+            <mat-error>
+              Required date is required
+            </mat-error>
+          }
+
+        </mat-form-field>
+
+      </div>
+
+
+      <!-- JUSTIFICATION -->
+
+      <mat-form-field
+        appearance="outline"
+        class="full-width">
+
+        <mat-label>Business Justification</mat-label>
+
+        <textarea
+          matInput
+          rows="4"
+          formControlName="justification"
+          placeholder="Explain why this purchase is required...">
+        </textarea>
+
+        @if (
+          requestForm.controls.justification.touched &&
+          requestForm.controls.justification.hasError('required')
+        ) {
+          <mat-error>
+            Business justification is required
+          </mat-error>
+        }
+
+      </mat-form-field>
+
+
+      <!-- ACTIONS -->
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          mat-stroked-button
+          routerLink="/procurement">
+
+          Cancel
+
+        </button>
+
+        <button
+          type="submit"
+          mat-flat-button
+          color="primary"
+          [disabled]="submitted">
+
+          <mat-icon>send</mat-icon>
+
+          Submit Request
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </mat-card>
+
+</div>

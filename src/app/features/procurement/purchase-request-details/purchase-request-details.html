@@ -1,0 +1,388 @@
+<div class="details-page">
+
+  <!-- HEADER -->
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="breadcrumb">
+        Procurement / Purchase Requests / {{ request.id }}
+      </div>
+
+      <h1>{{ request.title }}</h1>
+
+      <p>
+        Purchase Request {{ request.id }}
+      </p>
+
+    </div>
+
+    <button
+      mat-stroked-button
+      routerLink="/procurement">
+
+      <mat-icon>arrow_back</mat-icon>
+
+      Back to Requests
+
+    </button>
+
+  </div>
+
+
+  <!-- STATUS -->
+
+  <div class="status-row">
+
+    <span class="status-badge pending">
+      <mat-icon>pending</mat-icon>
+      {{ request.status }}
+    </span>
+
+    <span class="priority-badge high">
+      {{ request.priority }} PRIORITY
+    </span>
+
+  </div>
+
+
+  <!-- MAIN GRID -->
+
+  <div class="details-grid">
+
+
+    <!-- REQUEST INFORMATION -->
+
+    <mat-card class="details-card">
+
+      <div class="card-title">
+
+        <div class="title-icon blue">
+          <mat-icon>description</mat-icon>
+        </div>
+
+        <div>
+          <h2>Request Information</h2>
+          <p>Basic purchase request details</p>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="details-list">
+
+        <div class="detail-item">
+          <span>Request ID</span>
+          <strong>{{ request.id }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Request Title</span>
+          <strong>{{ request.title }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Category</span>
+          <strong>{{ request.category }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Requester</span>
+          <strong>{{ request.requester }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Department</span>
+          <strong>{{ request.department }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Request Date</span>
+          <strong>{{ request.requestDate }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Required Date</span>
+          <strong>{{ request.requiredDate }}</strong>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- FINANCIAL INFORMATION -->
+
+    <mat-card class="details-card">
+
+      <div class="card-title">
+
+        <div class="title-icon green">
+          <mat-icon>payments</mat-icon>
+        </div>
+
+        <div>
+          <h2>Financial Details</h2>
+          <p>Purchase and supplier information</p>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="details-list">
+
+        <div class="detail-item">
+          <span>Supplier</span>
+          <strong>{{ request.supplier }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Quantity</span>
+          <strong>{{ request.quantity }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Estimated Amount</span>
+          <strong class="amount">
+            ₹{{ request.amount.toLocaleString('en-IN') }}
+          </strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Payment Status</span>
+          <strong>Pending Approval</strong>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- DESCRIPTION -->
+
+    <mat-card class="details-card full-card">
+
+      <div class="card-title">
+
+        <div class="title-icon purple">
+          <mat-icon>notes</mat-icon>
+        </div>
+
+        <div>
+          <h2>Description</h2>
+          <p>Request description and business justification</p>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="text-section">
+
+        <h3>Description</h3>
+
+        <p>
+          {{ request.description }}
+        </p>
+
+        <h3>Business Justification</h3>
+
+        <p>
+          {{ request.justification }}
+        </p>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- ZERO TRUST SECURITY -->
+
+    <mat-card class="details-card full-card security-card">
+
+      <div class="card-title">
+
+        <div class="title-icon security">
+          <mat-icon>security</mat-icon>
+        </div>
+
+        <div>
+          <h2>Zero Trust Security Status</h2>
+          <p>Security checks associated with this request</p>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="security-grid">
+
+        <div class="security-item">
+
+          <mat-icon class="success">
+            check_circle
+          </mat-icon>
+
+          <div>
+            <strong>Identity Verified</strong>
+            <span>Requester identity has been verified</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-item">
+
+          <mat-icon class="success">
+            check_circle
+          </mat-icon>
+
+          <div>
+            <strong>Device Trusted</strong>
+            <span>Request originated from a trusted device</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-item">
+
+          <mat-icon class="success">
+            check_circle
+          </mat-icon>
+
+          <div>
+            <strong>Risk Assessment</strong>
+            <span>No high-risk activity detected</span>
+          </div>
+
+        </div>
+
+
+        <div class="security-item">
+
+          <mat-icon class="warning">
+            warning
+          </mat-icon>
+
+          <div>
+            <strong>Approval Required</strong>
+            <span>Procurement approval is still pending</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- APPROVAL TIMELINE -->
+
+    <mat-card class="details-card full-card">
+
+      <div class="card-title">
+
+        <div class="title-icon orange">
+          <mat-icon>timeline</mat-icon>
+        </div>
+
+        <div>
+          <h2>Approval Timeline</h2>
+          <p>Request processing history</p>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="timeline">
+
+        <div class="timeline-item completed">
+
+          <div class="timeline-icon">
+            <mat-icon>check</mat-icon>
+          </div>
+
+          <div>
+            <strong>Request Created</strong>
+            <span>04 Oct 2026 • 10:15 AM</span>
+          </div>
+
+        </div>
+
+
+        <div class="timeline-item completed">
+
+          <div class="timeline-icon">
+            <mat-icon>verified_user</mat-icon>
+          </div>
+
+          <div>
+            <strong>Security Verification Completed</strong>
+            <span>04 Oct 2026 • 10:16 AM</span>
+          </div>
+
+        </div>
+
+
+        <div class="timeline-item active">
+
+          <div class="timeline-icon">
+            <mat-icon>pending</mat-icon>
+          </div>
+
+          <div>
+            <strong>Procurement Approval</strong>
+            <span>Waiting for approval</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- ACTIONS -->
+
+  <div class="actions">
+
+    <button
+      mat-stroked-button
+      routerLink="/procurement">
+
+      Close
+
+    </button>
+
+    <button
+      mat-stroked-button
+      color="warn"
+      (click)="rejectRequest()">
+
+      <mat-icon>close</mat-icon>
+
+      Reject
+
+    </button>
+
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="approveRequest()">
+
+      <mat-icon>check</mat-icon>
+
+      Approve Request
+
+    </button>
+
+  </div>
+
+</div>

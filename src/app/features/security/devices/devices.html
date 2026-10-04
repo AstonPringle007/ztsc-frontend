@@ -1,0 +1,324 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1>Device Trust Management</h1>
+      <p>
+        Zero Trust device inventory and continuous trust verification
+      </p>
+    </div>
+
+    <div class="security-status">
+      <mat-icon>verified_user</mat-icon>
+      Zero Trust Active
+    </div>
+  </div>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>devices</mat-icon>
+      </div>
+      <div>
+        <span>Total Devices</span>
+        <strong>{{ totalDevices() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card trusted">
+      <div class="stat-icon">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <div>
+        <span>Trusted Devices</span>
+        <strong>{{ trustedDevices() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <div class="stat-icon">
+        <mat-icon>gpp_bad</mat-icon>
+      </div>
+      <div>
+        <span>Untrusted Devices</span>
+        <strong>{{ untrustedDevices() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card danger">
+      <div class="stat-icon">
+        <mat-icon>security</mat-icon>
+      </div>
+      <div>
+        <span>High Risk</span>
+        <strong>{{ highRiskDevices() }}</strong>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Filters -->
+
+  <mat-card class="filter-card">
+
+    <div class="filter-row">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Search devices</mat-label>
+        <input
+          matInput
+          placeholder="Device, user or IP"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Trust</mat-label>
+        <mat-select
+          [ngModel]="trustFilter()"
+          (ngModelChange)="trustFilter.set($event)">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option value="TRUSTED">Trusted</mat-option>
+          <mat-option value="UNTRUSTED">Untrusted</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option value="ACTIVE">Active</mat-option>
+          <mat-option value="INACTIVE">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Risk</mat-label>
+        <mat-select
+          [ngModel]="riskFilter()"
+          (ngModelChange)="riskFilter.set($event)">
+          <mat-option value="ALL">All</mat-option>
+          <mat-option value="LOW">Low</mat-option>
+          <mat-option value="MEDIUM">Medium</mat-option>
+          <mat-option value="HIGH">High</mat-option>
+          <mat-option value="CRITICAL">Critical</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+  </mat-card>
+
+  <!-- Device table -->
+
+  <mat-card class="table-card">
+
+    <div class="table-header">
+      <div>
+        <h2>Registered Devices</h2>
+        <p>
+          {{ filteredDevices().length }} device(s) displayed
+        </p>
+      </div>
+
+      <div class="trust-info">
+        <mat-icon>info</mat-icon>
+        Every request must pass trust verification
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+
+      <table mat-table [dataSource]="filteredDevices()">
+
+        <!-- Device -->
+
+        <ng-container matColumnDef="device">
+          <th mat-header-cell *matHeaderCellDef>Device</th>
+
+          <td mat-cell *matCellDef="let device">
+            <div class="device-cell">
+              <div class="device-icon">
+                <mat-icon>laptop</mat-icon>
+              </div>
+
+              <div>
+                <strong>{{ device.deviceName }}</strong>
+                <span>{{ device.deviceId }}</span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- User -->
+
+        <ng-container matColumnDef="user">
+          <th mat-header-cell *matHeaderCellDef>User</th>
+
+          <td mat-cell *matCellDef="let device">
+            <div class="user-cell">
+              <strong>{{ device.user }}</strong>
+              <span>{{ device.role }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Network -->
+
+        <ng-container matColumnDef="network">
+          <th mat-header-cell *matHeaderCellDef>Network</th>
+
+          <td mat-cell *matCellDef="let device">
+            <div class="network-cell">
+              <strong>{{ device.ipAddress }}</strong>
+              <span>{{ device.userAgent }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Trust -->
+
+        <ng-container matColumnDef="trust">
+          <th mat-header-cell *matHeaderCellDef>Trust</th>
+
+          <td mat-cell *matCellDef="let device">
+
+            <span
+              class="status-badge"
+              [class.trusted]="device.trusted"
+              [class.untrusted]="!device.trusted">
+
+              <mat-icon>
+                {{ device.trusted ? 'verified' : 'gpp_bad' }}
+              </mat-icon>
+
+              {{ device.trusted ? 'TRUSTED' : 'UNTRUSTED' }}
+
+            </span>
+
+          </td>
+        </ng-container>
+
+        <!-- Risk -->
+
+        <ng-container matColumnDef="risk">
+          <th mat-header-cell *matHeaderCellDef>Risk</th>
+
+          <td mat-cell *matCellDef="let device">
+
+            <span
+              class="risk-badge"
+              [ngClass]="getRiskClass(device.risk)">
+
+              {{ device.risk }}
+
+            </span>
+
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+
+          <td mat-cell *matCellDef="let device">
+
+            <span
+              class="status-dot"
+              [class.active]="device.active">
+
+              {{ device.active ? 'Active' : 'Inactive' }}
+
+            </span>
+
+          </td>
+        </ng-container>
+
+        <!-- Last Seen -->
+
+        <ng-container matColumnDef="lastSeen">
+          <th mat-header-cell *matHeaderCellDef>Last Seen</th>
+
+          <td mat-cell *matCellDef="let device">
+            {{ device.lastSeen }}
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+
+          <td mat-cell *matCellDef="let device">
+
+            <button
+              mat-icon-button
+              color="primary"
+              [title]="device.trusted ? 'Revoke trust' : 'Trust device'"
+              (click)="device.trusted
+                ? revokeTrust(device)
+                : trustDevice(device)">
+
+              <mat-icon>
+                {{ device.trusted ? 'gpp_bad' : 'verified_user' }}
+              </mat-icon>
+
+            </button>
+
+            <button
+              mat-icon-button
+              color="warn"
+              title="Disable device"
+              [disabled]="!device.active"
+              (click)="disableDevice(device)">
+
+              <mat-icon>block</mat-icon>
+
+            </button>
+
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="[
+            'device',
+            'user',
+            'network',
+            'trust',
+            'risk',
+            'status',
+            'lastSeen',
+            'actions'
+          ]">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: [
+            'device',
+            'user',
+            'network',
+            'trust',
+            'risk',
+            'status',
+            'lastSeen',
+            'actions'
+          ]">
+        </tr>
+
+      </table>
+
+    </div>
+
+  </mat-card>
+
+</div>

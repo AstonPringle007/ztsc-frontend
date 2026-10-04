@@ -1,0 +1,414 @@
+<div class="page-container">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Security Events</h1>
+      <p>
+        Monitor authentication, device trust and suspicious security activity
+      </p>
+    </div>
+
+    <div class="monitoring-status">
+      <span class="pulse"></span>
+      Real-time Monitoring
+    </div>
+
+  </div>
+
+  <!-- Statistics -->
+
+  <div class="stats-grid">
+
+    <mat-card class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>security</mat-icon>
+      </div>
+
+      <div>
+        <span>Total Events</span>
+        <strong>{{ totalEvents() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card danger">
+      <div class="stat-icon">
+        <mat-icon>warning</mat-icon>
+      </div>
+
+      <div>
+        <span>Open Events</span>
+        <strong>{{ openEvents() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <div class="stat-icon">
+        <mat-icon>manage_search</mat-icon>
+      </div>
+
+      <div>
+        <span>Investigating</span>
+        <strong>{{ investigatingEvents() }}</strong>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card critical">
+      <div class="stat-icon">
+        <mat-icon>gpp_maybe</mat-icon>
+      </div>
+
+      <div>
+        <span>Critical Events</span>
+        <strong>{{ criticalEvents() }}</strong>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Filters -->
+
+  <mat-card class="filter-card">
+
+    <div class="filter-row">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Search events</mat-label>
+
+        <input
+          matInput
+          placeholder="Event, user, device or IP"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Severity</mat-label>
+
+        <mat-select
+          [ngModel]="severityFilter()"
+          (ngModelChange)="severityFilter.set($event)">
+
+          <mat-option value="ALL">All Severities</mat-option>
+          <mat-option value="LOW">Low</mat-option>
+          <mat-option value="MEDIUM">Medium</mat-option>
+          <mat-option value="HIGH">High</mat-option>
+          <mat-option value="CRITICAL">Critical</mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+
+        <mat-select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)">
+
+          <mat-option value="ALL">All Statuses</mat-option>
+          <mat-option value="OPEN">Open</mat-option>
+          <mat-option value="INVESTIGATING">
+            Investigating
+          </mat-option>
+          <mat-option value="RESOLVED">Resolved</mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Event Type</mat-label>
+
+        <mat-select
+          [ngModel]="typeFilter()"
+          (ngModelChange)="typeFilter.set($event)">
+
+          <mat-option value="ALL">All Types</mat-option>
+          <mat-option value="UNTRUSTED_DEVICE">
+            Untrusted Device
+          </mat-option>
+          <mat-option value="AUTHENTICATION_FAILURE">
+            Authentication Failure
+          </mat-option>
+          <mat-option value="UNAUTHORIZED_ACCESS">
+            Unauthorized Access
+          </mat-option>
+          <mat-option value="TOKEN_FAILURE">
+            Token Failure
+          </mat-option>
+          <mat-option value="ANOMALOUS_ACTIVITY">
+            Anomalous Activity
+          </mat-option>
+          <mat-option value="DEVICE_TRUST_REVOKED">
+            Trust Revoked
+          </mat-option>
+          <mat-option value="LOGIN_SUCCESS">
+            Login Success
+          </mat-option>
+          <mat-option value="IP_ANOMALY">
+            IP Anomaly
+          </mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+  </mat-card>
+
+  <!-- Security events -->
+
+  <mat-card class="table-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Security Event Log</h2>
+        <p>
+          {{ filteredEvents().length }} event(s) displayed
+        </p>
+      </div>
+
+      <div class="zero-trust-label">
+        <mat-icon>shield</mat-icon>
+        Zero Trust Event Detection
+      </div>
+
+    </div>
+
+    <div class="table-wrapper">
+
+      <table mat-table [dataSource]="filteredEvents()">
+
+        <!-- Event -->
+
+        <ng-container matColumnDef="event">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Event
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <div class="event-cell">
+
+              <div
+                class="event-icon"
+                [ngClass]="getSeverityClass(event.severity)">
+
+                <mat-icon>
+                  {{ getEventIcon(event.type) }}
+                </mat-icon>
+
+              </div>
+
+              <div>
+                <strong>{{ event.eventId }}</strong>
+
+                <span>
+                  {{ event.type.replace('_', ' ') }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Description -->
+
+        <ng-container matColumnDef="description">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Description
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <div class="description-cell">
+              {{ event.description }}
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- User -->
+
+        <ng-container matColumnDef="user">
+
+          <th mat-header-cell *matHeaderCellDef>
+            User / Device
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <div class="user-cell">
+
+              <strong>{{ event.user }}</strong>
+
+              <span>
+                {{ event.device }}
+              </span>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Network -->
+
+        <ng-container matColumnDef="network">
+
+          <th mat-header-cell *matHeaderCellDef>
+            IP Address
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <code>
+              {{ event.ipAddress }}
+            </code>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Severity -->
+
+        <ng-container matColumnDef="severity">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Severity
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <span
+              class="severity-badge"
+              [ngClass]="getSeverityClass(event.severity)">
+
+              {{ event.severity }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Status -->
+
+        <ng-container matColumnDef="status">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Status
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <span
+              class="status-badge"
+              [ngClass]="getStatusClass(event.status)">
+
+              {{ event.status }}
+
+            </span>
+
+          </td>
+
+        </ng-container>
+
+        <!-- Timestamp -->
+
+        <ng-container matColumnDef="timestamp">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Timestamp
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+            {{ event.timestamp }}
+          </td>
+
+        </ng-container>
+
+        <!-- Actions -->
+
+        <ng-container matColumnDef="actions">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Actions
+          </th>
+
+          <td mat-cell *matCellDef="let event">
+
+            <button
+              mat-icon-button
+              color="primary"
+              title="Investigate"
+              [disabled]="event.status === 'RESOLVED'"
+              (click)="investigateEvent(event)">
+
+              <mat-icon>
+                manage_search
+              </mat-icon>
+
+            </button>
+
+            <button
+              mat-icon-button
+              color="primary"
+              title="Resolve"
+              [disabled]="event.status === 'RESOLVED'"
+              (click)="resolveEvent(event)">
+
+              <mat-icon>
+                check_circle
+              </mat-icon>
+
+            </button>
+
+          </td>
+
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="[
+            'event',
+            'description',
+            'user',
+            'network',
+            'severity',
+            'status',
+            'timestamp',
+            'actions'
+          ]">
+        </tr>
+
+        <tr
+          mat-row
+          *matRowDef="let row; columns: [
+            'event',
+            'description',
+            'user',
+            'network',
+            'severity',
+            'status',
+            'timestamp',
+            'actions'
+          ]">
+        </tr>
+
+      </table>
+
+    </div>
+
+  </mat-card>
+
+</div>

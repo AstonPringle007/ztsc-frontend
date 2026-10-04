@@ -1,0 +1,328 @@
+<div class="settings-page">
+
+  <div class="page-header">
+
+    <div>
+      <div class="eyebrow">
+        <mat-icon>settings</mat-icon>
+        SYSTEM CONFIGURATION
+      </div>
+
+      <h1>System Settings</h1>
+
+      <p>
+        Configure Zero Trust security policies and system controls.
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        mat-stroked-button
+        (click)="resetSettings()">
+
+        <mat-icon>restart_alt</mat-icon>
+        Reset Defaults
+
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="saveSettings()">
+
+        <mat-icon>save</mat-icon>
+        Save Changes
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Security status -->
+
+  <div class="security-status">
+
+    <div class="status-icon">
+      <mat-icon>verified_user</mat-icon>
+    </div>
+
+    <div class="status-content">
+
+      <strong>Zero Trust Security is Active</strong>
+
+      <span>
+        Your system is configured to continuously verify users,
+        devices and access requests.
+      </span>
+
+    </div>
+
+    <div class="status-badge">
+      PROTECTED
+    </div>
+
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- Zero Trust -->
+
+    <mat-card class="settings-card">
+
+      <div class="card-header">
+
+        <div class="card-icon">
+          <mat-icon>security</mat-icon>
+        </div>
+
+        <div>
+          <h2>Zero Trust Security</h2>
+          <p>Core security enforcement policies</p>
+        </div>
+
+      </div>
+
+      <div class="setting-list">
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Enable Zero Trust</strong>
+            <span>
+              Require verification for every access request.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="zeroTrustEnabled()"
+            (change)="toggleSetting('zeroTrustEnabled')">
+          </mat-slide-toggle>
+
+        </div>
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Device Verification</strong>
+            <span>
+              Verify device trust before granting access.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="deviceVerification()"
+            (change)="toggleSetting('deviceVerification')">
+          </mat-slide-toggle>
+
+        </div>
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Continuous Monitoring</strong>
+            <span>
+              Continuously monitor user and device activity.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="continuousMonitoring()"
+            (change)="toggleSetting('continuousMonitoring')">
+          </mat-slide-toggle>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- AI -->
+
+    <mat-card class="settings-card">
+
+      <div class="card-header">
+
+        <div class="card-icon ai">
+          <mat-icon>psychology</mat-icon>
+        </div>
+
+        <div>
+          <h2>AI Security</h2>
+          <p>Anomaly detection configuration</p>
+        </div>
+
+      </div>
+
+      <div class="setting-list">
+
+        <div class="setting-row">
+
+          <div>
+            <strong>AI Anomaly Detection</strong>
+            <span>
+              Detect unusual behavior using Isolation Forest.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="anomalyDetection()"
+            (change)="toggleSetting('anomalyDetection')">
+          </mat-slide-toggle>
+
+        </div>
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Real-Time Analysis</strong>
+            <span>
+              Analyze user activity continuously.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="continuousMonitoring()"
+            (change)="toggleSetting('continuousMonitoring')">
+          </mat-slide-toggle>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- Authentication -->
+
+    <mat-card class="settings-card">
+
+      <div class="card-header">
+
+        <div class="card-icon auth">
+          <mat-icon>lock</mat-icon>
+        </div>
+
+        <div>
+          <h2>Authentication</h2>
+          <p>Identity and access configuration</p>
+        </div>
+
+      </div>
+
+      <div class="setting-list">
+
+        <div class="setting-row">
+
+          <div>
+            <strong>JWT Authentication</strong>
+            <span>
+              Authenticate API requests using JWT tokens.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="jwtAuthentication()"
+            (change)="toggleSetting('jwtAuthentication')">
+          </mat-slide-toggle>
+
+        </div>
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Audit Logging</strong>
+            <span>
+              Record authentication and authorization events.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="auditLogging()"
+            (change)="toggleSetting('auditLogging')">
+          </mat-slide-toggle>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+    <!-- Notifications -->
+
+    <mat-card class="settings-card">
+
+      <div class="card-header">
+
+        <div class="card-icon notification">
+          <mat-icon>notifications</mat-icon>
+        </div>
+
+        <div>
+          <h2>Notifications</h2>
+          <p>Security notification preferences</p>
+        </div>
+
+      </div>
+
+      <div class="setting-list">
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Login Alerts</strong>
+            <span>
+              Notify administrators about user logins.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="loginAlerts()"
+            (change)="toggleSetting('loginAlerts')">
+          </mat-slide-toggle>
+
+        </div>
+
+        <div class="setting-row">
+
+          <div>
+            <strong>Security Alerts</strong>
+            <span>
+              Notify administrators about critical security events.
+            </span>
+          </div>
+
+          <mat-slide-toggle
+            [checked]="securityAlerts()"
+            (change)="toggleSetting('securityAlerts')">
+          </mat-slide-toggle>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Security information -->
+
+  <mat-card class="information-card">
+
+    <div class="info-icon">
+      <mat-icon>info</mat-icon>
+    </div>
+
+    <div>
+      <h3>Zero Trust Security Model</h3>
+
+      <p>
+        This system follows a "never trust, always verify" approach.
+        User identity, device trust, access behavior and risk are
+        evaluated before sensitive supply-chain resources are accessed.
+      </p>
+    </div>
+
+  </mat-card>
+
+</div>

@@ -1,0 +1,412 @@
+<div class="finance-page">
+
+  <!-- Header -->
+  <div class="page-header">
+
+    <div>
+      <div class="breadcrumb">
+        <span>Finance</span>
+        <mat-icon>chevron_right</mat-icon>
+        <span>Dashboard</span>
+      </div>
+
+      <h1>Finance Dashboard</h1>
+
+      <p>
+        Monitor payments, financial transactions and payment risks.
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        mat-stroked-button
+        routerLink="/finance/payments">
+        <mat-icon>payments</mat-icon>
+        View Payments
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Summary Cards -->
+
+  <div class="summary-grid">
+
+    <mat-card class="summary-card">
+
+      <div class="card-icon blue">
+        <mat-icon>account_balance_wallet</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span class="label">Total Payments</span>
+        <strong>{{ totalPayments() }}</strong>
+        <small>All transactions</small>
+      </div>
+
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+
+      <div class="card-icon orange">
+        <mat-icon>schedule</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span class="label">Pending Payments</span>
+        <strong>{{ pendingPayments() }}</strong>
+        <small>{{ formatCurrency(pendingAmount()) }}</small>
+      </div>
+
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+
+      <div class="card-icon green">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span class="label">Completed</span>
+        <strong>{{ completedPayments() }}</strong>
+        <small>{{ formatCurrency(completedAmount()) }}</small>
+      </div>
+
+    </mat-card>
+
+
+    <mat-card class="summary-card">
+
+      <div class="card-icon red">
+        <mat-icon>warning</mat-icon>
+      </div>
+
+      <div class="card-content">
+        <span class="label">Needs Review</span>
+        <strong>{{ reviewPayments() }}</strong>
+        <small>Risk assessment required</small>
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Financial Overview -->
+
+  <div class="content-grid">
+
+    <mat-card class="overview-card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>Financial Overview</h2>
+          <p>Current payment position</p>
+        </div>
+
+        <mat-icon>analytics</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="financial-overview">
+
+        <div class="amount-section">
+          <span>Total Transaction Value</span>
+
+          <strong>
+            {{ formatCurrency(totalAmount()) }}
+          </strong>
+        </div>
+
+
+        <div class="progress-section">
+
+          <div class="progress-label">
+            <span>Payment Processing</span>
+            <strong>72%</strong>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-value"></div>
+          </div>
+
+          <small>
+            Payments are being processed according to approval workflow.
+          </small>
+
+        </div>
+
+
+        <div class="financial-stats">
+
+          <div>
+            <span>Approved</span>
+            <strong>{{ approvedPayments() }}</strong>
+          </div>
+
+          <div>
+            <span>Pending</span>
+            <strong>{{ pendingPayments() }}</strong>
+          </div>
+
+          <div>
+            <span>Completed</span>
+            <strong>{{ completedPayments() }}</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </mat-card>
+
+
+    <!-- Zero Trust -->
+
+    <mat-card class="security-card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>Zero Trust Financial Security</h2>
+          <p>Payment security verification</p>
+        </div>
+
+        <mat-icon>security</mat-icon>
+
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="security-list">
+
+        <div class="security-item">
+          <mat-icon>verified_user</mat-icon>
+
+          <div>
+            <strong>Identity Verification</strong>
+            <span>Verified</span>
+          </div>
+        </div>
+
+
+        <div class="security-item">
+          <mat-icon>devices</mat-icon>
+
+          <div>
+            <strong>Trusted Device</strong>
+            <span>Verified</span>
+          </div>
+        </div>
+
+
+        <div class="security-item">
+          <mat-icon>shield</mat-icon>
+
+          <div>
+            <strong>Payment Risk</strong>
+            <span>LOW</span>
+          </div>
+        </div>
+
+
+        <div class="security-item">
+          <mat-icon>policy</mat-icon>
+
+          <div>
+            <strong>Policy Compliance</strong>
+            <span>Compliant</span>
+          </div>
+        </div>
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+
+  <!-- Recent Payments -->
+
+  <mat-card class="payments-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Recent Payments</h2>
+        <p>Latest financial transactions</p>
+      </div>
+
+      <button
+        mat-button
+        routerLink="/finance/payments">
+        View All
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="payment-list">
+
+      @for (payment of recentPayments(); track payment.id) {
+
+        <div class="payment-row">
+
+          <div class="payment-icon">
+            <mat-icon>
+              {{ getStatusIcon(payment.status) }}
+            </mat-icon>
+          </div>
+
+
+          <div class="payment-info">
+
+            <strong>
+              {{ payment.invoiceNumber }}
+            </strong>
+
+            <span>
+              {{ payment.supplier }}
+            </span>
+
+          </div>
+
+
+          <div class="payment-request">
+
+            <span>Purchase Request</span>
+
+            <strong>
+              {{ payment.purchaseRequest }}
+            </strong>
+
+          </div>
+
+
+          <div class="payment-amount">
+
+            <strong>
+              {{ formatCurrency(payment.amount) }}
+            </strong>
+
+            <span>
+              {{ payment.paymentMethod }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="status"
+            [class.pending]="payment.status === 'PENDING'"
+            [class.approved]="payment.status === 'APPROVED'"
+            [class.completed]="payment.status === 'COMPLETED'"
+            [class.review]="payment.status === 'REVIEW'">
+
+            <mat-icon>
+              {{ getStatusIcon(payment.status) }}
+            </mat-icon>
+
+            {{ payment.status }}
+
+          </div>
+
+
+          <div class="risk">
+
+            <mat-icon
+              [matTooltip]="'Risk: ' + payment.riskLevel">
+
+              {{ getRiskIcon(payment.riskLevel) }}
+
+            </mat-icon>
+
+            <span>{{ payment.riskLevel }}</span>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </mat-card>
+
+
+  <!-- Quick Actions -->
+
+  <mat-card class="quick-actions">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Quick Actions</h2>
+        <p>Finance operations</p>
+      </div>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="actions-grid">
+
+      <button
+        mat-stroked-button
+        routerLink="/finance/payments">
+
+        <mat-icon>payments</mat-icon>
+
+        Manage Payments
+
+      </button>
+
+
+      <button
+        mat-stroked-button
+        routerLink="/procurement">
+
+        <mat-icon>request_quote</mat-icon>
+
+        Purchase Requests
+
+      </button>
+
+
+      <button
+        mat-stroked-button
+        routerLink="/suppliers">
+
+        <mat-icon>business</mat-icon>
+
+        Supplier Accounts
+
+      </button>
+
+
+      <button
+        mat-stroked-button>
+
+        <mat-icon>description</mat-icon>
+
+        Financial Reports
+
+      </button>
+
+    </div>
+
+  </mat-card>
+
+</div>

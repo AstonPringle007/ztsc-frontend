@@ -1,0 +1,251 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">
+        <mat-icon>admin_panel_settings</mat-icon>
+        SYSTEM ADMINISTRATION
+      </div>
+
+      <h1>Admin Dashboard</h1>
+
+      <p>
+        Manage users, roles, security policies and system configuration.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        mat-stroked-button
+        routerLink="/admin/users">
+        <mat-icon>people</mat-icon>
+        Manage Users
+      </button>
+
+      <button
+        mat-flat-button
+        color="primary"
+        routerLink="/admin/settings">
+        <mat-icon>settings</mat-icon>
+        System Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Security banner -->
+  <div class="security-banner">
+    <div class="security-icon">
+      <mat-icon>verified_user</mat-icon>
+    </div>
+
+    <div class="security-content">
+      <h3>Zero Trust Administration Active</h3>
+
+      <p>
+        Identity, device trust, access control and security events
+        are continuously monitored.
+      </p>
+    </div>
+
+    <div class="security-score">
+      <span>Security Score</span>
+      <strong>94%</strong>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid">
+
+    @for (stat of systemStats; track stat.title) {
+      <mat-card class="stat-card">
+
+        <div class="stat-icon">
+          <mat-icon>{{ stat.icon }}</mat-icon>
+        </div>
+
+        <div class="stat-content">
+          <span>{{ stat.title }}</span>
+
+          <strong>
+           {{ typeof stat.value === 'function' ? stat.value() : stat.value }}
+          </strong>
+
+          <small>
+            {{ stat.description }}
+          </small>
+        </div>
+
+      </mat-card>
+    }
+
+  </div>
+
+  <!-- Main grid -->
+  <div class="content-grid">
+
+    <!-- Users -->
+    <mat-card class="panel users-panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Recent Users</h2>
+          <p>Latest registered system users</p>
+        </div>
+
+        <button
+          mat-button
+          color="primary"
+          routerLink="/admin/users">
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+
+      </div>
+
+      <div class="user-list">
+
+        @for (user of users(); track user.id) {
+
+          <div class="user-row">
+
+            <div class="user-avatar">
+              {{ user.username.charAt(0) }}
+            </div>
+
+            <div class="user-info">
+              <strong>{{ user.username }}</strong>
+
+              <span>
+                {{ user.id }} · {{ user.lastLogin }}
+              </span>
+            </div>
+
+            <span
+              class="role-badge"
+              [class]="getRoleClass(user.role)">
+              {{ user.role }}
+            </span>
+
+            <span
+              class="status-badge"
+              [class]="getStatusClass(user.status)">
+              {{ user.status }}
+            </span>
+
+          </div>
+
+        }
+
+      </div>
+
+    </mat-card>
+
+    <!-- Roles -->
+    <mat-card class="panel roles-panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Role Distribution</h2>
+          <p>Users by system role</p>
+        </div>
+
+      </div>
+
+      <div class="role-list">
+
+        @for (item of roles; track item.role) {
+
+          <div class="role-row">
+
+            <div class="role-icon">
+              <mat-icon>{{ item.icon }}</mat-icon>
+            </div>
+
+            <div class="role-name">
+              <strong>{{ item.role }}</strong>
+
+              <div class="role-progress">
+                <span
+                  [style.width.%]="item.count * 5">
+                </span>
+              </div>
+            </div>
+
+            <strong class="role-count">
+              {{ item.count }}
+            </strong>
+
+          </div>
+
+        }
+
+      </div>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Administration cards -->
+  <div class="admin-actions">
+
+    <mat-card
+      class="action-card"
+      routerLink="/admin/users">
+
+      <div class="action-icon">
+        <mat-icon>manage_accounts</mat-icon>
+      </div>
+
+      <div>
+        <h3>User Management</h3>
+        <p>
+          Create, activate, deactivate and manage user roles.
+        </p>
+      </div>
+
+      <mat-icon class="arrow">arrow_forward</mat-icon>
+
+    </mat-card>
+
+    <mat-card
+      class="action-card"
+      routerLink="/admin/settings">
+
+      <div class="action-icon">
+        <mat-icon>security</mat-icon>
+      </div>
+
+      <div>
+        <h3>Security Configuration</h3>
+        <p>
+          Configure Zero Trust policies and security controls.
+        </p>
+      </div>
+
+      <mat-icon class="arrow">arrow_forward</mat-icon>
+
+    </mat-card>
+
+    <mat-card class="action-card">
+
+      <div class="action-icon">
+        <mat-icon>policy</mat-icon>
+      </div>
+
+      <div>
+        <h3>Access Policies</h3>
+        <p>
+          Review role-based access and authentication policies.
+        </p>
+      </div>
+
+      <mat-icon class="arrow">arrow_forward</mat-icon>
+
+    </mat-card>
+
+  </div>
+
+</div>

@@ -1,0 +1,157 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  color: #64748b;
+  font-size: 13px;
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+
+  mat-icon {
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+  }
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 29px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+  }
+}
+
+.form-card {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 20px;
+}
+
+.section-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #e8eefc;
+  color: #2563eb;
+
+  &.security {
+    background: #e7f7ee;
+    color: #15803d;
+  }
+}
+
+.section-heading h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.section-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  padding-top: 22px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #475569;
+
+  mat-icon {
+    flex-shrink: 0;
+    color: #2563eb;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: #334155;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-bottom: 30px;
+}
+
+@media (max-width: 700px) {
+  .page-container {
+    padding: 18px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+
+    button {
+      flex: 1;
+    }
+  }
+}
