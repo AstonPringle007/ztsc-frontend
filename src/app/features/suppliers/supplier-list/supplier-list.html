@@ -1,28 +1,51 @@
 <div class="page-container">
 
-  <!-- Header -->
+  <!-- HEADER -->
+
   <div class="page-header">
 
     <div>
+
       <div class="breadcrumb">
-        <span>Supply Chain</span>
-        <mat-icon>chevron_right</mat-icon>
-        <span>Suppliers</span>
+
+        <span>
+          Supply Chain
+        </span>
+
+        <mat-icon>
+          chevron_right
+        </mat-icon>
+
+        <span>
+          Suppliers
+        </span>
+
       </div>
 
-      <h1>Suppliers</h1>
+
+      <h1>
+        Suppliers
+      </h1>
+
 
       <p>
         Manage suppliers, supplier risk and supply chain relationships.
       </p>
+
     </div>
+
 
     <button
       mat-raised-button
       color="primary"
-      (click)="createSupplier()">
+      type="button"
+      (click)="createSupplier()"
+      [disabled]="loading">
 
-      <mat-icon>add</mat-icon>
+      <mat-icon>
+        add
+      </mat-icon>
+
       Add Supplier
 
     </button>
@@ -30,18 +53,59 @@
   </div>
 
 
-  <!-- Summary Cards -->
+  <!-- ERROR -->
+
+  @if (errorMessage) {
+
+    <div class="error-message">
+
+      <mat-icon>
+        error
+      </mat-icon>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+      <button
+        mat-button
+        type="button"
+        (click)="refreshSuppliers()">
+
+        Retry
+
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- SUMMARY CARDS -->
+
   <div class="summary-grid">
+
 
     <mat-card class="summary-card">
 
       <div class="summary-icon">
-        <mat-icon>business</mat-icon>
+
+        <mat-icon>
+          business
+        </mat-icon>
+
       </div>
 
       <div>
-        <span class="summary-label">Total Suppliers</span>
-        <strong>{{ suppliers().length }}</strong>
+
+        <span class="summary-label">
+          Total Suppliers
+        </span>
+
+        <strong>
+          {{ suppliers().length }}
+        </strong>
+
       </div>
 
     </mat-card>
@@ -50,12 +114,23 @@
     <mat-card class="summary-card">
 
       <div class="summary-icon success">
-        <mat-icon>verified</mat-icon>
+
+        <mat-icon>
+          verified
+        </mat-icon>
+
       </div>
 
       <div>
-        <span class="summary-label">Active Suppliers</span>
-        <strong>{{ activeSuppliers() }}</strong>
+
+        <span class="summary-label">
+          Active Suppliers
+        </span>
+
+        <strong>
+          {{ activeSuppliers() }}
+        </strong>
+
       </div>
 
     </mat-card>
@@ -64,12 +139,23 @@
     <mat-card class="summary-card">
 
       <div class="summary-icon warning">
-        <mat-icon>warning</mat-icon>
+
+        <mat-icon>
+          pause_circle
+        </mat-icon>
+
       </div>
 
       <div>
-        <span class="summary-label">High Risk</span>
-        <strong>{{ highRiskSuppliers() }}</strong>
+
+        <span class="summary-label">
+          Suspended
+        </span>
+
+        <strong>
+          {{ suspendedSuppliers() }}
+        </strong>
+
       </div>
 
     </mat-card>
@@ -78,12 +164,23 @@
     <mat-card class="summary-card">
 
       <div class="summary-icon info">
-        <mat-icon>shopping_cart</mat-icon>
+
+        <mat-icon>
+          star
+        </mat-icon>
+
       </div>
 
       <div>
-        <span class="summary-label">Total Orders</span>
-        <strong>{{ totalOrders() }}</strong>
+
+        <span class="summary-label">
+          Average Rating
+        </span>
+
+        <strong>
+          {{ averageRating() | number:'1.1-1' }}
+        </strong>
+
       </div>
 
     </mat-card>
@@ -91,50 +188,103 @@
   </div>
 
 
-  <!-- Filters -->
+  <!-- FILTERS -->
+
   <mat-card class="filter-card">
 
     <div class="filter-row">
 
-      <mat-form-field appearance="outline" class="search-field">
 
-        <mat-label>Search suppliers</mat-label>
+      <mat-form-field
+        appearance="outline"
+        class="search-field">
+
+        <mat-label>
+          Search suppliers
+        </mat-label>
 
         <input
           matInput
           [(ngModel)]="searchText"
-          placeholder="Name, ID, category or contact">
+          placeholder="Name, ID, code, category or contact">
 
-        <mat-icon matPrefix>search</mat-icon>
+        <mat-icon matPrefix>
+          search
+        </mat-icon>
 
       </mat-form-field>
 
 
-      <mat-form-field appearance="outline">
+      <mat-form-field
+        appearance="outline">
 
-        <mat-label>Status</mat-label>
+        <mat-label>
+          Status
+        </mat-label>
 
-        <mat-select [(ngModel)]="selectedStatus">
+        <mat-select
+          [(ngModel)]="selectedStatus">
 
-          <mat-option value="ALL">All Status</mat-option>
-          <mat-option value="ACTIVE">Active</mat-option>
-          <mat-option value="SUSPENDED">Suspended</mat-option>
+          <mat-option value="ALL">
+            All Status
+          </mat-option>
+
+          <mat-option value="ACTIVE">
+            Active
+          </mat-option>
+
+          <mat-option value="SUSPENDED">
+            Suspended
+          </mat-option>
 
         </mat-select>
 
       </mat-form-field>
 
 
-      <mat-form-field appearance="outline">
+      <!--
+        Risk is currently a UI placeholder.
+        The backend Supplier entity does not
+        currently expose riskLevel.
+      -->
 
-        <mat-label>Risk Level</mat-label>
+      <mat-form-field
+        appearance="outline">
 
-        <mat-select [(ngModel)]="selectedRisk">
+        <mat-label>
+          Risk Level
+        </mat-label>
 
-          <mat-option value="ALL">All Risk</mat-option>
-          <mat-option value="LOW">Low</mat-option>
-          <mat-option value="MEDIUM">Medium</mat-option>
-          <mat-option value="HIGH">High</mat-option>
+        <mat-select
+          [(ngModel)]="selectedRisk">
+
+          <mat-option value="ALL">
+            All Risk
+          </mat-option>
+
+          <mat-option
+            value="LOW"
+            disabled>
+
+            Low
+
+          </mat-option>
+
+          <mat-option
+            value="MEDIUM"
+            disabled>
+
+            Medium
+
+          </mat-option>
+
+          <mat-option
+            value="HIGH"
+            disabled>
+
+            High
+
+          </mat-option>
 
         </mat-select>
 
@@ -146,7 +296,10 @@
         type="button"
         (click)="clearFilters()">
 
-        <mat-icon>filter_alt_off</mat-icon>
+        <mat-icon>
+          filter_alt_off
+        </mat-icon>
+
         Clear
 
       </button>
@@ -156,267 +309,420 @@
   </mat-card>
 
 
-  <!-- Supplier Table -->
+  <!-- SUPPLIER TABLE -->
+
   <mat-card class="table-card">
+
 
     <div class="table-header">
 
       <div>
-        <h2>Supplier Directory</h2>
+
+        <h2>
+          Supplier Directory
+        </h2>
 
         <span>
-          Showing {{ filteredSuppliers().length }} suppliers
+          Showing
+          {{ filteredSuppliers().length }}
+          suppliers
         </span>
+
       </div>
 
+
+      <button
+        mat-icon-button
+        type="button"
+        matTooltip="Refresh"
+        (click)="refreshSuppliers()"
+        [disabled]="loading">
+
+        <mat-icon>
+          refresh
+        </mat-icon>
+
+      </button>
+
     </div>
 
 
-    <div class="table-wrapper">
+    @if (loading) {
 
-      <table
-        mat-table
-        [dataSource]="filteredSuppliers()"
-        class="supplier-table">
+      <div class="loading-state">
 
+        <mat-icon>
+          sync
+        </mat-icon>
 
-        <!-- ID -->
-        <ng-container matColumnDef="id">
+        <span>
+          Loading suppliers...
+        </span>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Supplier ID
-          </th>
+      </div>
 
-          <td mat-cell *matCellDef="let supplier">
-
-            <strong>{{ supplier.id }}</strong>
-
-          </td>
-
-        </ng-container>
+    }
 
 
-        <!-- Supplier -->
-        <ng-container matColumnDef="supplier">
+    @if (!loading) {
 
-          <th mat-header-cell *matHeaderCellDef>
-            Supplier
-          </th>
+      <div class="table-wrapper">
 
-          <td mat-cell *matCellDef="let supplier">
+        <table
+          mat-table
+          [dataSource]="filteredSuppliers()"
+          class="supplier-table">
 
-            <div class="supplier-info">
 
-              <div class="supplier-avatar">
-                {{ supplier.name.charAt(0) }}
+          <!-- ID -->
+
+          <ng-container matColumnDef="id">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Supplier ID
+
+            </th>
+
+
+            <td
+              mat-cell
+              *matCellDef="let supplier">
+
+              <strong>
+                SUP-{{ supplier.id }}
+              </strong>
+
+              <small>
+                {{ supplier.supplierCode }}
+              </small>
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- SUPPLIER -->
+
+          <ng-container matColumnDef="supplier">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Supplier
+
+            </th>
+
+
+            <td
+              mat-cell
+              *matCellDef="let supplier">
+
+              <div class="supplier-info">
+
+                <div class="supplier-avatar">
+
+                  {{ supplier.name.charAt(0) }}
+
+                </div>
+
+
+                <div>
+
+                  <strong>
+                    {{ supplier.name }}
+                  </strong>
+
+                  <span>
+                    {{ supplier.contactPerson }}
+                  </span>
+
+                </div>
+
               </div>
 
-              <div>
+            </td>
 
-                <strong>{{ supplier.name }}</strong>
+          </ng-container>
 
-                <span>
-                  {{ supplier.contactPerson }}
-                </span>
+
+          <!-- CATEGORY -->
+
+          <ng-container matColumnDef="category">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Category
+
+            </th>
+
+
+            <td
+              mat-cell
+              *matCellDef="let supplier">
+
+              {{ supplier.category }}
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- LOCATION -->
+
+          <ng-container matColumnDef="location">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Location
+
+            </th>
+
+
+            <td
+              mat-cell
+              *matCellDef="let supplier">
+
+              <div class="location">
+
+                <mat-icon>
+                  location_on
+                </mat-icon>
+
+                {{ supplier.city }},
+                {{ supplier.country }}
 
               </div>
 
-            </div>
+            </td>
 
-          </td>
+          </ng-container>
 
-        </ng-container>
 
+          <!-- STATUS -->
 
-        <!-- Category -->
-        <ng-container matColumnDef="category">
+          <ng-container matColumnDef="status">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Category
-          </th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          <td mat-cell *matCellDef="let supplier">
-            {{ supplier.category }}
-          </td>
+              Status
 
-        </ng-container>
+            </th>
 
 
-        <!-- Location -->
-        <ng-container matColumnDef="location">
+            <td
+              mat-cell
+              *matCellDef="let supplier">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Location
-          </th>
+              <span
+                class="status-badge"
+                [class.active]="
+                  supplier.status === 'ACTIVE'
+                "
+                [class.suspended]="
+                  supplier.status === 'SUSPENDED'
+                ">
 
-          <td mat-cell *matCellDef="let supplier">
+                <span class="status-dot"></span>
 
-            <div class="location">
+                {{ supplier.status }}
 
-              <mat-icon>location_on</mat-icon>
+              </span>
 
-              {{ supplier.location }}
+            </td>
 
-            </div>
+          </ng-container>
 
-          </td>
 
-        </ng-container>
+          <!-- RISK -->
 
+          <ng-container matColumnDef="risk">
 
-        <!-- Status -->
-        <ng-container matColumnDef="status">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Status
-          </th>
+              Risk
 
-          <td mat-cell *matCellDef="let supplier">
+            </th>
 
-            <span
-              class="status-badge"
-              [class.active]="supplier.status === 'ACTIVE'"
-              [class.suspended]="supplier.status === 'SUSPENDED'">
 
-              <span class="status-dot"></span>
+            <td
+              mat-cell
+              *matCellDef="let supplier">
 
-              {{ supplier.status }}
+              <span class="risk-badge low">
 
-            </span>
+                Not Assessed
 
-          </td>
+              </span>
 
-        </ng-container>
+            </td>
 
+          </ng-container>
 
-        <!-- Risk -->
-        <ng-container matColumnDef="risk">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Risk
-          </th>
+          <!-- RATING -->
 
-          <td mat-cell *matCellDef="let supplier">
+          <ng-container matColumnDef="rating">
 
-            <span
-              class="risk-badge"
-              [class.low]="supplier.riskLevel === 'LOW'"
-              [class.medium]="supplier.riskLevel === 'MEDIUM'"
-              [class.high]="supplier.riskLevel === 'HIGH'">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-              {{ supplier.riskLevel }}
+              Rating
 
-            </span>
+            </th>
 
-          </td>
 
-        </ng-container>
+            <td
+              mat-cell
+              *matCellDef="let supplier">
 
+              <div class="rating">
 
-        <!-- Rating -->
-        <ng-container matColumnDef="rating">
+                <mat-icon>
+                  star
+                </mat-icon>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Rating
-          </th>
+                {{ supplier.rating || 0 }}
 
-          <td mat-cell *matCellDef="let supplier">
+              </div>
 
-            <div class="rating">
+            </td>
 
-              <mat-icon>star</mat-icon>
+          </ng-container>
 
-              {{ supplier.rating }}
 
-            </div>
+          <!-- ORDERS -->
 
-          </td>
+          <ng-container matColumnDef="orders">
 
-        </ng-container>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
+              Orders
 
-        <!-- Orders -->
-        <ng-container matColumnDef="orders">
+            </th>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Orders
-          </th>
 
-          <td mat-cell *matCellDef="let supplier">
+            <td
+              mat-cell
+              *matCellDef="let supplier">
 
-            <strong>
-              {{ supplier.totalOrders }}
-            </strong>
+              <span class="not-available">
 
-          </td>
+                —
 
-        </ng-container>
+              </span>
 
+            </td>
 
-        <!-- Actions -->
-        <ng-container matColumnDef="actions">
+          </ng-container>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Actions
-          </th>
 
-          <td mat-cell *matCellDef="let supplier">
+          <!-- ACTIONS -->
 
-            <button
-              mat-icon-button
-              matTooltip="View Supplier"
-              (click)="viewSupplier(supplier)">
+          <ng-container matColumnDef="actions">
 
-              <mat-icon>visibility</mat-icon>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-            </button>
+              Actions
 
+            </th>
 
-            <button
-              mat-icon-button
-              matTooltip="Edit Supplier"
-              (click)="editSupplier(supplier)">
 
-              <mat-icon>edit</mat-icon>
+            <td
+              mat-cell
+              *matCellDef="let supplier">
 
-            </button>
 
-          </td>
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="View Supplier"
+                (click)="viewSupplier(supplier)">
 
-        </ng-container>
+                <mat-icon>
+                  visibility
+                </mat-icon>
 
+              </button>
 
-        <tr
-          mat-header-row
-          *matHeaderRowDef="displayedColumns">
-        </tr>
 
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns;">
-        </tr>
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="Edit Supplier"
+                (click)="editSupplier(supplier)">
 
+                <mat-icon>
+                  edit
+                </mat-icon>
 
-      </table>
+              </button>
 
 
-      @if (filteredSuppliers().length === 0) {
+            </td>
 
-        <div class="empty-state">
+          </ng-container>
 
-          <mat-icon>search_off</mat-icon>
 
-          <h3>No suppliers found</h3>
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns">
 
-          <p>
-            Try changing your search or filter criteria.
-          </p>
+          </tr>
 
-        </div>
 
-      }
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: displayedColumns;
+            ">
 
-    </div>
+          </tr>
+
+
+        </table>
+
+
+        @if (filteredSuppliers().length === 0) {
+
+          <div class="empty-state">
+
+            <mat-icon>
+              search_off
+            </mat-icon>
+
+            <h3>
+              No suppliers found
+            </h3>
+
+            <p>
+              Try changing your search or filter criteria.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
 
   </mat-card>
 

@@ -13,8 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../core/auth/auth';
 
+import { AuthService } from '../../../core/auth/auth';
 
 @Component({
   selector: 'app-register',
@@ -47,6 +47,11 @@ export class RegisterComponent {
     username: ['', [
       Validators.required,
       Validators.minLength(3)
+    ]],
+
+    email: ['', [
+      Validators.required,
+      Validators.email
     ]],
 
     password: ['', [

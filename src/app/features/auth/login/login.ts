@@ -12,8 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../core/auth/auth';
 
+import { AuthService } from '../../../core/auth/auth';
 
 @Component({
   selector: 'app-login',
@@ -47,6 +47,7 @@ export class LoginComponent {
 
   login(): void {
 
+    // Validate form
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -54,24 +55,35 @@ export class LoginComponent {
 
     this.loading = true;
     this.errorMessage = '';
-this.router.navigate(['/dashboard']);
-    this.authService.login(this.loginForm.getRawValue()).subscribe({
+
+    const loginRequest = this.loginForm.getRawValue();
+
+    this.authService.login(loginRequest).subscribe({
+
       next: response => {
+
         console.log('Login successful:', response);
 
         this.loading = false;
 
+        // JWT has already been stored by AuthService
         this.router.navigate(['/dashboard']);
       },
 
       error: error => {
+
         console.error('Login failed:', error);
 
         this.loading = false;
 
-        this.errorMessage =
-          error?.error?.message ||
-          'Invalid username or password';
+        if (error?.status === 401) {
+          this.errorMessage = 'Invalid username or password';
+        } else if (error?.error?.message) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage =
+            'Unable to connect to the server. Please try again.';
+        }
       }
     });
   }

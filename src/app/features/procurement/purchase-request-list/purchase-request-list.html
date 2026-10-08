@@ -1,7 +1,6 @@
 <div class="procurement-page">
 
   <!-- HEADER -->
-
   <div class="page-header">
 
     <div>
@@ -15,7 +14,9 @@
     <button
       mat-flat-button
       color="primary"
-      (click)="createRequest()">
+      type="button"
+      (click)="createRequest()"
+      [disabled]="loading">
 
       <mat-icon>add</mat-icon>
 
@@ -26,10 +27,35 @@
   </div>
 
 
-  <!-- SUMMARY CARDS -->
+  <!-- ERROR MESSAGE -->
+  @if (errorMessage) {
 
+    <div class="error-message">
+
+      <mat-icon>error</mat-icon>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+      <button
+        mat-button
+        type="button"
+        (click)="refreshRequests()">
+
+        Retry
+
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- SUMMARY CARDS -->
   <div class="summary-grid">
 
+    <!-- TOTAL -->
     <mat-card class="summary-card">
 
       <div class="summary-icon blue">
@@ -37,6 +63,7 @@
       </div>
 
       <div>
+
         <div class="summary-label">
           Total Requests
         </div>
@@ -44,11 +71,13 @@
         <div class="summary-value">
           {{ purchaseRequests.length }}
         </div>
+
       </div>
 
     </mat-card>
 
 
+    <!-- PENDING -->
     <mat-card class="summary-card">
 
       <div class="summary-icon orange">
@@ -56,18 +85,21 @@
       </div>
 
       <div>
+
         <div class="summary-label">
           Pending
         </div>
 
         <div class="summary-value">
-          {{ purchaseRequests.filter(r => r.status === 'PENDING').length }}
+          {{ pendingCount }}
         </div>
+
       </div>
 
     </mat-card>
 
 
+    <!-- APPROVED -->
     <mat-card class="summary-card">
 
       <div class="summary-icon green">
@@ -75,18 +107,21 @@
       </div>
 
       <div>
+
         <div class="summary-label">
           Approved
         </div>
 
         <div class="summary-value">
-          {{ purchaseRequests.filter(r => r.status === 'APPROVED').length }}
+          {{ approvedCount }}
         </div>
+
       </div>
 
     </mat-card>
 
 
+    <!-- REJECTED -->
     <mat-card class="summary-card">
 
       <div class="summary-icon red">
@@ -94,13 +129,15 @@
       </div>
 
       <div>
+
         <div class="summary-label">
           Rejected
         </div>
 
         <div class="summary-value">
-          {{ purchaseRequests.filter(r => r.status === 'REJECTED').length }}
+          {{ rejectedCount }}
         </div>
+
       </div>
 
     </mat-card>
@@ -109,16 +146,18 @@
 
 
   <!-- FILTERS -->
-
   <mat-card class="filter-card">
 
     <div class="filters">
 
+      <!-- SEARCH -->
       <mat-form-field
         appearance="outline"
         class="search-field">
 
-        <mat-label>Search requests</mat-label>
+        <mat-label>
+          Search requests
+        </mat-label>
 
         <mat-icon matPrefix>
           search
@@ -132,11 +171,15 @@
       </mat-form-field>
 
 
+      <!-- STATUS -->
       <mat-form-field appearance="outline">
 
-        <mat-label>Status</mat-label>
+        <mat-label>
+          Status
+        </mat-label>
 
-        <mat-select [(ngModel)]="selectedStatus">
+        <mat-select
+          [(ngModel)]="selectedStatus">
 
           <mat-option value="ALL">
             All Statuses
@@ -163,11 +206,15 @@
       </mat-form-field>
 
 
+      <!-- PRIORITY -->
       <mat-form-field appearance="outline">
 
-        <mat-label>Priority</mat-label>
+        <mat-label>
+          Priority
+        </mat-label>
 
-        <mat-select [(ngModel)]="selectedPriority">
+        <mat-select
+          [(ngModel)]="selectedPriority">
 
           <mat-option value="ALL">
             All Priorities
@@ -195,14 +242,15 @@
 
 
   <!-- TABLE -->
-
   <mat-card class="table-card">
 
     <div class="table-header">
 
       <div>
 
-        <h2>Purchase Requests</h2>
+        <h2>
+          Purchase Requests
+        </h2>
 
         <span>
           {{ filteredRequests.length }} request(s)
@@ -210,239 +258,355 @@
 
       </div>
 
+
+      <button
+        mat-icon-button
+        type="button"
+        matTooltip="Refresh"
+        (click)="refreshRequests()"
+        [disabled]="loading">
+
+        <mat-icon>
+          refresh
+        </mat-icon>
+
+      </button>
+
     </div>
 
 
-    <div class="table-container">
+    <!-- LOADING -->
+    @if (loading) {
 
-      <table
-        mat-table
-        [dataSource]="filteredRequests"
-        class="request-table">
+      <div class="loading-state">
 
+        <mat-icon>
+          sync
+        </mat-icon>
 
-        <!-- ID -->
+        <span>
+          Loading purchase requests...
+        </span>
 
-        <ng-container matColumnDef="id">
+      </div>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Request ID
-          </th>
+    }
 
-          <td mat-cell *matCellDef="let request">
 
-            <span class="request-id">
-              {{ request.id }}
-            </span>
+    <!-- TABLE -->
+    @if (!loading) {
 
-          </td>
+      <div class="table-container">
 
-        </ng-container>
+        <table
+          mat-table
+          [dataSource]="filteredRequests"
+          class="request-table">
 
 
-        <!-- TITLE -->
+          <!-- ID -->
+          <ng-container matColumnDef="id">
 
-        <ng-container matColumnDef="title">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Request
-          </th>
+              Request ID
 
-          <td mat-cell *matCellDef="let request">
+            </th>
 
-            <div class="request-title">
-              {{ request.title }}
-            </div>
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-          </td>
+              <span class="request-id">
+                PR-{{ request.id }}
+              </span>
 
-        </ng-container>
+            </td>
 
+          </ng-container>
 
-        <!-- REQUESTER -->
 
-        <ng-container matColumnDef="requester">
+          <!-- TITLE -->
+          <ng-container matColumnDef="title">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Requester
-          </th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          <td mat-cell *matCellDef="let request">
-            {{ request.requester }}
-          </td>
+              Request
 
-        </ng-container>
+            </th>
 
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-        <!-- SUPPLIER -->
+              <div class="request-title">
 
-        <ng-container matColumnDef="supplier">
+                {{ request.title }}
 
-          <th mat-header-cell *matHeaderCellDef>
-            Supplier
-          </th>
+                @if (request.productName) {
 
-          <td mat-cell *matCellDef="let request">
-            {{ request.supplier }}
-          </td>
+                  <small>
+                    {{ request.productName }}
+                  </small>
 
-        </ng-container>
+                }
 
+              </div>
 
-        <!-- AMOUNT -->
+            </td>
 
-        <ng-container matColumnDef="amount">
+          </ng-container>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Amount
-          </th>
 
-          <td mat-cell *matCellDef="let request">
+          <!-- REQUESTER -->
+          <ng-container matColumnDef="requester">
 
-            <strong>
-              ₹{{ request.amount.toLocaleString('en-IN') }}
-            </strong>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          </td>
+              Requester
 
-        </ng-container>
+            </th>
 
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-        <!-- PRIORITY -->
+              {{ request.requestedBy || '—' }}
 
-        <ng-container matColumnDef="priority">
+            </td>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Priority
-          </th>
+          </ng-container>
 
-          <td mat-cell *matCellDef="let request">
 
-            <span
-              class="badge priority"
-              [class.high]="request.priority === 'HIGH'"
-              [class.medium]="request.priority === 'MEDIUM'"
-              [class.low]="request.priority === 'LOW'">
+          <!-- SUPPLIER -->
+          <ng-container matColumnDef="supplier">
 
-              {{ request.priority }}
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-            </span>
+              Supplier
 
-          </td>
+            </th>
 
-        </ng-container>
+            <td
+              mat-cell
+              *matCellDef="let request">
 
+              {{ request.supplier || '—' }}
 
-        <!-- STATUS -->
+            </td>
 
-        <ng-container matColumnDef="status">
+          </ng-container>
 
-          <th mat-header-cell *matHeaderCellDef>
-            Status
-          </th>
 
-          <td mat-cell *matCellDef="let request">
+          <!-- AMOUNT -->
+          <ng-container matColumnDef="amount">
 
-            <span
-              class="badge status"
-              [class.pending]="request.status === 'PENDING'"
-              [class.approved]="request.status === 'APPROVED'"
-              [class.completed]="request.status === 'COMPLETED'"
-              [class.rejected]="request.status === 'REJECTED'">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-              {{ request.status }}
+              Amount
 
-            </span>
+            </th>
 
-          </td>
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-        </ng-container>
+              <strong>
+                ₹{{ request.amount.toLocaleString('en-IN') }}
+              </strong>
 
+            </td>
 
-        <!-- DATE -->
+          </ng-container>
 
-        <ng-container matColumnDef="date">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Date
-          </th>
+          <!-- PRIORITY -->
+          <ng-container matColumnDef="priority">
 
-          <td mat-cell *matCellDef="let request">
-            {{ request.date }}
-          </td>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-        </ng-container>
+              Priority
 
+            </th>
 
-        <!-- ACTIONS -->
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-        <ng-container matColumnDef="actions">
+              <span
+                class="badge priority"
+                [class.high]="request.priority === 'HIGH'"
+                [class.medium]="request.priority === 'MEDIUM'"
+                [class.low]="request.priority === 'LOW'">
 
-          <th mat-header-cell *matHeaderCellDef>
-            Actions
-          </th>
+                {{ request.priority }}
 
-          <td mat-cell *matCellDef="let request">
+              </span>
 
-            <button
-              mat-icon-button
-              matTooltip="View"
-              (click)="viewRequest(request)">
+            </td>
 
-              <mat-icon>
-                visibility
-              </mat-icon>
+          </ng-container>
 
-            </button>
 
-            <button
-              mat-icon-button
-              matTooltip="Edit"
-              (click)="editRequest(request)">
+          <!-- STATUS -->
+          <ng-container matColumnDef="status">
 
-              <mat-icon>
-                edit
-              </mat-icon>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-            </button>
+              Status
 
-          </td>
+            </th>
 
-        </ng-container>
+            <td
+              mat-cell
+              *matCellDef="let request">
 
+              <span
+                class="badge status"
+                [class.pending]="request.status === 'PENDING'"
+                [class.approved]="request.status === 'APPROVED'"
+                [class.completed]="request.status === 'COMPLETED'"
+                [class.rejected]="request.status === 'REJECTED'">
 
-        <tr
-          mat-header-row
-          *matHeaderRowDef="displayedColumns">
-        </tr>
+                {{ request.status }}
 
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns;">
-        </tr>
+              </span>
 
+            </td>
 
-      </table>
+          </ng-container>
 
-      @if (filteredRequests.length === 0) {
 
-        <div class="empty-state">
+          <!-- DATE -->
+          <ng-container matColumnDef="date">
 
-          <mat-icon>
-            search_off
-          </mat-icon>
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
 
-          <h3>No requests found</h3>
+              Date
 
-          <p>
-            Try changing your search or filters.
-          </p>
+            </th>
 
-        </div>
+            <td
+              mat-cell
+              *matCellDef="let request">
 
-      }
+              {{ request.createdAt
+                ? (request.createdAt | date:'dd MMM yyyy')
+                : '—'
+              }}
 
-    </div>
+            </td>
+
+          </ng-container>
+
+
+          <!-- ACTIONS -->
+          <ng-container matColumnDef="actions">
+
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+
+              Actions
+
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let request">
+
+
+              <!-- VIEW -->
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="View"
+                (click)="viewRequest(request)">
+
+                <mat-icon>
+                  visibility
+                </mat-icon>
+
+              </button>
+
+
+              <!-- EDIT / DETAILS -->
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="Edit"
+                (click)="editRequest(request)">
+
+                <mat-icon>
+                  edit
+                </mat-icon>
+
+              </button>
+
+            </td>
+
+          </ng-container>
+
+
+          <!-- HEADER ROW -->
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns">
+          </tr>
+
+
+          <!-- DATA ROW -->
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: displayedColumns;
+            ">
+          </tr>
+
+        </table>
+
+
+        <!-- EMPTY STATE -->
+        @if (filteredRequests.length === 0) {
+
+          <div class="empty-state">
+
+            <mat-icon>
+              search_off
+            </mat-icon>
+
+            <h3>
+              No requests found
+            </h3>
+
+            <p>
+              Try changing your search or filters.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
 
   </mat-card>
 

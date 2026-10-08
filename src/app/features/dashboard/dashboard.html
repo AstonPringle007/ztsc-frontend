@@ -1,3 +1,11 @@
+
+```
+
+### 2. `dashboard.html`
+
+Replace the entire file:
+
+```html
 <div class="dashboard">
 
   <!-- HEADER -->
@@ -5,35 +13,59 @@
   <div class="dashboard-header">
 
     <div>
+
       <h1>Security Dashboard</h1>
 
       <p>
         Monitor your supply chain security and system activity.
       </p>
+
     </div>
 
     <button
       mat-flat-button
-      color="primary">
+      color="primary"
+      (click)="refreshDashboard()"
+      [disabled]="loading">
 
       <mat-icon>refresh</mat-icon>
 
-      Refresh
+      {{ loading ? 'Refreshing...' : 'Refresh' }}
 
     </button>
 
   </div>
 
 
-  <!-- SECURITY SCORE -->
+  <!-- ERROR -->
+
+  @if (errorMessage) {
+
+    <div class="error-message">
+
+      <mat-icon>error</mat-icon>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+    </div>
+
+  }
+
+
+  <!-- SECURITY / RISK -->
 
   <div class="top-grid">
+
+    <!-- SECURITY SCORE -->
 
     <mat-card class="security-card">
 
       <div class="card-header">
 
         <div>
+
           <div class="card-title">
             Security Score
           </div>
@@ -41,28 +73,40 @@
           <div class="score">
             {{ securityScore }}%
           </div>
+
         </div>
 
         <div class="score-icon">
-          <mat-icon>shield</mat-icon>
+
+          <mat-icon>
+            shield
+          </mat-icon>
+
         </div>
 
       </div>
+
 
       <mat-progress-bar
         mode="determinate"
         [value]="securityScore">
       </mat-progress-bar>
 
+
       <div class="score-footer">
 
         <span class="status-good">
-          <mat-icon>check_circle</mat-icon>
+
+          <mat-icon>
+            check_circle
+          </mat-icon>
+
           Good security posture
+
         </span>
 
         <span>
-          Updated just now
+          {{ loading ? 'Updating...' : 'Updated just now' }}
         </span>
 
       </div>
@@ -82,25 +126,40 @@
             Current Risk Level
           </div>
 
-          <div class="risk-level">
-            LOW
+          <div
+            class="risk-level"
+            [class.risk-medium]="riskLevel === 'MEDIUM'"
+            [class.risk-high]="riskLevel === 'HIGH'"
+            [class.risk-critical]="riskLevel === 'CRITICAL'">
+
+            {{ riskLevel }}
+
           </div>
 
         </div>
 
+
         <div class="risk-icon">
-          <mat-icon>verified_user</mat-icon>
+
+          <mat-icon>
+            verified_user
+          </mat-icon>
+
         </div>
 
       </div>
 
+
       <p>
-        No critical security threats detected.
+        {{ riskDescription }}
       </p>
+
 
       <div class="risk-footer">
 
-        <mat-icon>check_circle</mat-icon>
+        <mat-icon>
+          check_circle
+        </mat-icon>
 
         System operating normally
 
@@ -115,10 +174,16 @@
 
   <div class="stats-grid">
 
+    <!-- PURCHASE REQUESTS -->
+
     <mat-card class="stat-card">
 
       <div class="stat-icon blue">
-        <mat-icon>shopping_cart</mat-icon>
+
+        <mat-icon>
+          shopping_cart
+        </mat-icon>
+
       </div>
 
       <div class="stat-content">
@@ -140,10 +205,16 @@
     </mat-card>
 
 
+    <!-- PENDING APPROVALS -->
+
     <mat-card class="stat-card">
 
       <div class="stat-icon orange">
-        <mat-icon>pending_actions</mat-icon>
+
+        <mat-icon>
+          pending_actions
+        </mat-icon>
+
       </div>
 
       <div class="stat-content">
@@ -165,10 +236,16 @@
     </mat-card>
 
 
+    <!-- ACTIVE DEVICES -->
+
     <mat-card class="stat-card">
 
       <div class="stat-icon green">
-        <mat-icon>devices</mat-icon>
+
+        <mat-icon>
+          devices
+        </mat-icon>
+
       </div>
 
       <div class="stat-content">
@@ -190,10 +267,16 @@
     </mat-card>
 
 
+    <!-- SECURITY EVENTS -->
+
     <mat-card class="stat-card">
 
       <div class="stat-icon red">
-        <mat-icon>security</mat-icon>
+
+        <mat-icon>
+          security
+        </mat-icon>
+
       </div>
 
       <div class="stat-content">
@@ -207,7 +290,7 @@
         </div>
 
         <div class="stat-description">
-          Detected today
+          Detected in system
         </div>
 
       </div>
@@ -221,7 +304,6 @@
 
   <div class="content-grid">
 
-
     <!-- RECENT ACTIVITY -->
 
     <mat-card class="activity-card">
@@ -230,7 +312,9 @@
 
         <div>
 
-          <h2>Recent Activity</h2>
+          <h2>
+            Recent Activity
+          </h2>
 
           <p>
             Latest security and supply chain events
@@ -238,20 +322,30 @@
 
         </div>
 
-        <button
-          mat-button
-          color="primary">
-
-          View All
-
-        </button>
-
       </div>
 
 
       <div class="activity-list">
 
-        @for (activity of recentActivities; track activity.title) {
+        @if (recentActivities.length === 0 && !loading) {
+
+          <div class="empty-state">
+
+            <mat-icon>
+              info
+            </mat-icon>
+
+            No recent activity available.
+
+          </div>
+
+        }
+
+
+        @for (
+          activity of recentActivities;
+          track activity.title
+        ) {
 
           <div class="activity-item">
 
@@ -265,6 +359,7 @@
 
             </div>
 
+
             <div class="activity-content">
 
               <div class="activity-title">
@@ -276,6 +371,7 @@
               </div>
 
             </div>
+
 
             <div class="activity-time">
               {{ activity.time }}
@@ -298,7 +394,9 @@
 
         <div>
 
-          <h2>Security Events</h2>
+          <h2>
+            Security Events
+          </h2>
 
           <p>
             Events requiring monitoring
@@ -315,7 +413,25 @@
 
       <div class="events-list">
 
-        @for (event of securityEvents; track event.name) {
+        @if (securityEvents.length === 0 && !loading) {
+
+          <div class="empty-state">
+
+            <mat-icon>
+              check_circle
+            </mat-icon>
+
+            No security events available.
+
+          </div>
+
+        }
+
+
+        @for (
+          event of securityEvents;
+          track event.name
+        ) {
 
           <div class="event-item">
 
@@ -331,358 +447,6 @@
 
             </div>
 
-            <div
-              class="severity"
-              [class.high]="event.severity === 'HIGH'"
-              [class.medium]="event.severity === 'MEDIUM'"
-              [class.low]="event.severity === 'LOW'">
-
-              {{ event.severity }}
-
-            </div>
-
-          </div>
-
-        }
-
-      </div>
-
-    </mat-card>
-
-  </div>
-
-</div><div class="dashboard">
-
-  <!-- HEADER -->
-
-  <div class="dashboard-header">
-
-    <div>
-      <h1>Security Dashboard</h1>
-
-      <p>
-        Monitor your supply chain security and system activity.
-      </p>
-    </div>
-
-    <button
-      mat-flat-button
-      color="primary">
-
-      <mat-icon>refresh</mat-icon>
-
-      Refresh
-
-    </button>
-
-  </div>
-
-
-  <!-- SECURITY SCORE -->
-
-  <div class="top-grid">
-
-    <mat-card class="security-card">
-
-      <div class="card-header">
-
-        <div>
-          <div class="card-title">
-            Security Score
-          </div>
-
-          <div class="score">
-            {{ securityScore }}%
-          </div>
-        </div>
-
-        <div class="score-icon">
-          <mat-icon>shield</mat-icon>
-        </div>
-
-      </div>
-
-      <mat-progress-bar
-        mode="determinate"
-        [value]="securityScore">
-      </mat-progress-bar>
-
-      <div class="score-footer">
-
-        <span class="status-good">
-          <mat-icon>check_circle</mat-icon>
-          Good security posture
-        </span>
-
-        <span>
-          Updated just now
-        </span>
-
-      </div>
-
-    </mat-card>
-
-
-    <!-- RISK CARD -->
-
-    <mat-card class="risk-card">
-
-      <div class="card-header">
-
-        <div>
-
-          <div class="card-title">
-            Current Risk Level
-          </div>
-
-          <div class="risk-level">
-            LOW
-          </div>
-
-        </div>
-
-        <div class="risk-icon">
-          <mat-icon>verified_user</mat-icon>
-        </div>
-
-      </div>
-
-      <p>
-        No critical security threats detected.
-      </p>
-
-      <div class="risk-footer">
-
-        <mat-icon>check_circle</mat-icon>
-
-        System operating normally
-
-      </div>
-
-    </mat-card>
-
-  </div>
-
-
-  <!-- STATISTICS -->
-
-  <div class="stats-grid">
-
-    <mat-card class="stat-card">
-
-      <div class="stat-icon blue">
-        <mat-icon>shopping_cart</mat-icon>
-      </div>
-
-      <div class="stat-content">
-
-        <div class="stat-label">
-          Purchase Requests
-        </div>
-
-        <div class="stat-value">
-          {{ statistics.purchaseRequests }}
-        </div>
-
-        <div class="stat-description">
-          Total requests
-        </div>
-
-      </div>
-
-    </mat-card>
-
-
-    <mat-card class="stat-card">
-
-      <div class="stat-icon orange">
-        <mat-icon>pending_actions</mat-icon>
-      </div>
-
-      <div class="stat-content">
-
-        <div class="stat-label">
-          Pending Approvals
-        </div>
-
-        <div class="stat-value">
-          {{ statistics.pendingApprovals }}
-        </div>
-
-        <div class="stat-description">
-          Require attention
-        </div>
-
-      </div>
-
-    </mat-card>
-
-
-    <mat-card class="stat-card">
-
-      <div class="stat-icon green">
-        <mat-icon>devices</mat-icon>
-      </div>
-
-      <div class="stat-content">
-
-        <div class="stat-label">
-          Active Devices
-        </div>
-
-        <div class="stat-value">
-          {{ statistics.activeDevices }}
-        </div>
-
-        <div class="stat-description">
-          Currently connected
-        </div>
-
-      </div>
-
-    </mat-card>
-
-
-    <mat-card class="stat-card">
-
-      <div class="stat-icon red">
-        <mat-icon>security</mat-icon>
-      </div>
-
-      <div class="stat-content">
-
-        <div class="stat-label">
-          Security Events
-        </div>
-
-        <div class="stat-value">
-          {{ statistics.securityEvents }}
-        </div>
-
-        <div class="stat-description">
-          Detected today
-        </div>
-
-      </div>
-
-    </mat-card>
-
-  </div>
-
-
-  <!-- LOWER SECTION -->
-
-  <div class="content-grid">
-
-
-    <!-- RECENT ACTIVITY -->
-
-    <mat-card class="activity-card">
-
-      <div class="section-header">
-
-        <div>
-
-          <h2>Recent Activity</h2>
-
-          <p>
-            Latest security and supply chain events
-          </p>
-
-        </div>
-
-        <button
-          mat-button
-          color="primary">
-
-          View All
-
-        </button>
-
-      </div>
-
-
-      <div class="activity-list">
-
-        @for (activity of recentActivities; track activity.title) {
-
-          <div class="activity-item">
-
-            <div
-              class="activity-icon"
-              [class]="activity.type">
-
-              <mat-icon>
-                {{ activity.icon }}
-              </mat-icon>
-
-            </div>
-
-            <div class="activity-content">
-
-              <div class="activity-title">
-                {{ activity.title }}
-              </div>
-
-              <div class="activity-description">
-                {{ activity.description }}
-              </div>
-
-            </div>
-
-            <div class="activity-time">
-              {{ activity.time }}
-            </div>
-
-          </div>
-
-        }
-
-      </div>
-
-    </mat-card>
-
-
-    <!-- SECURITY EVENTS -->
-
-    <mat-card class="events-card">
-
-      <div class="section-header">
-
-        <div>
-
-          <h2>Security Events</h2>
-
-          <p>
-            Events requiring monitoring
-          </p>
-
-        </div>
-
-        <mat-icon>
-          security
-        </mat-icon>
-
-      </div>
-
-
-      <div class="events-list">
-
-        @for (event of securityEvents; track event.name) {
-
-          <div class="event-item">
-
-            <div class="event-info">
-
-              <div class="event-name">
-                {{ event.name }}
-              </div>
-
-              <div class="event-count">
-                {{ event.count }} event(s)
-              </div>
-
-            </div>
 
             <div
               class="severity"

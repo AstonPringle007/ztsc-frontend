@@ -1,4 +1,9 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 
 import { MatCardModule } from '@angular/material/card';
@@ -10,22 +15,21 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
+
 import { Router } from '@angular/router';
 
-interface PurchaseRequest {
-  id: string;
-  title: string;
-  requester: string;
-  supplier: string;
-  amount: number;
-  status: string;
-  priority: string;
-  date: string;
-}
+import {
+  ProcurementService
+} from '../../../core/services/procurement.service';
+
+import {
+  PurchaseRequest
+} from '../../../core/models/purchase-request.model';
 
 @Component({
   selector: 'app-purchase-request-list',
   standalone: true,
+
   imports: [
     CommonModule,
     MatCardModule,
@@ -36,13 +40,19 @@ interface PurchaseRequest {
     MatInputModule,
     MatSelectModule,
     MatChipsModule,
-    FormsModule,
+    FormsModule
   ],
+
   templateUrl: './purchase-request-list.html',
-  styleUrl: './purchase-request-list.scss',
+  styleUrl: './purchase-request-list.scss'
 })
-export class PurchaseRequestListComponent {
+export class PurchaseRequestListComponent implements OnInit {
+
   private readonly router = inject(Router);
+
+  private readonly procurementService =
+    inject(ProcurementService);
+
   displayedColumns = [
     'id',
     'title',
@@ -52,105 +62,147 @@ export class PurchaseRequestListComponent {
     'priority',
     'status',
     'date',
-    'actions',
+    'actions'
   ];
 
   searchText = '';
+
   selectedStatus = 'ALL';
+
   selectedPriority = 'ALL';
 
-  purchaseRequests: PurchaseRequest[] = [
-    {
-      id: 'PR-1028',
-      title: 'Laptop Equipment',
-      requester: 'Pringle',
-      supplier: 'Tech Solutions Ltd',
-      amount: 245000,
-      status: 'PENDING',
-      priority: 'HIGH',
-      date: '04 Oct 2026',
-    },
-    {
-      id: 'PR-1027',
-      title: 'Warehouse Barcode Scanner',
-      requester: 'Arun',
-      supplier: 'Industrial Systems',
-      amount: 85000,
-      status: 'APPROVED',
-      priority: 'MEDIUM',
-      date: '03 Oct 2026',
-    },
-    {
-      id: 'PR-1026',
-      title: 'Network Security Devices',
-      requester: 'Pringle',
-      supplier: 'SecureTech',
-      amount: 180000,
-      status: 'PENDING',
-      priority: 'HIGH',
-      date: '02 Oct 2026',
-    },
-    {
-      id: 'PR-1025',
-      title: 'Office Supplies',
-      requester: 'Kumar',
-      supplier: 'Office World',
-      amount: 32000,
-      status: 'COMPLETED',
-      priority: 'LOW',
-      date: '01 Oct 2026',
-    },
-    {
-      id: 'PR-1024',
-      title: 'Storage Equipment',
-      requester: 'Suresh',
-      supplier: 'Warehouse Pro',
-      amount: 125000,
-      status: 'REJECTED',
-      priority: 'MEDIUM',
-      date: '30 Sep 2026',
-    },
-    {
-      id: 'PR-1023',
-      title: 'Cloud Infrastructure',
-      requester: 'Pringle',
-      supplier: 'Cloud Systems',
-      amount: 310000,
-      status: 'APPROVED',
-      priority: 'HIGH',
-      date: '29 Sep 2026',
-    },
-  ];
+  purchaseRequests: PurchaseRequest[] = [];
 
-  get filteredRequests(): PurchaseRequest[] {
-    return this.purchaseRequests.filter((request) => {
-      const search = this.searchText.toLowerCase();
+  loading = false;
 
-      const matchesSearch =
-        !search ||
-        request.id.toLowerCase().includes(search) ||
-        request.title.toLowerCase().includes(search) ||
-        request.requester.toLowerCase().includes(search) ||
-        request.supplier.toLowerCase().includes(search);
+  errorMessage = '';
 
-      const matchesStatus = this.selectedStatus === 'ALL' || request.status === this.selectedStatus;
+  ngOnInit(): void {
+    this.loadPurchaseRequests();
+  }
 
-      const matchesPriority =
-        this.selectedPriority === 'ALL' || request.priority === this.selectedPriority;
+  loadPurchaseRequests(): void {
 
-      return matchesSearch && matchesStatus && matchesPriority;
+    this.loading = true;
+
+    this.errorMessage = '';
+
+    this.procurementService.getAll().subscribe({
+
+      next: (requests) => {
+
+        this.purchaseRequests = requests;
+
+        this.loading = false;
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load purchase requests:',
+          error
+        );
+
+        this.loading = false;
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to load purchase requests.';
+      }
     });
   }
 
+  get filteredRequests(): PurchaseRequest[] {
+
+    return this.purchaseRequests.filter((request) => {
+
+      const search =
+        this.searchText.trim().toLowerCase();
+
+      const requester =
+        request.requestedBy ?? '';
+
+      const matchesSearch =
+        !search ||
+        String(request.id)
+          .toLowerCase()
+          .includes(search) ||
+        request.title
+          .toLowerCase()
+          .includes(search) ||
+        requester
+          .toLowerCase()
+          .includes(search) ||
+        request.supplier
+          .toLowerCase()
+          .includes(search);
+
+      const matchesStatus =
+        this.selectedStatus === 'ALL' ||
+        request.status === this.selectedStatus;
+
+      const matchesPriority =
+        this.selectedPriority === 'ALL' ||
+        request.priority === this.selectedPriority;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority
+      );
+    });
+  }
+
+  get pendingCount(): number {
+
+    return this.purchaseRequests.filter(
+      request => request.status === 'PENDING'
+    ).length;
+  }
+
+  get approvedCount(): number {
+
+    return this.purchaseRequests.filter(
+      request => request.status === 'APPROVED'
+    ).length;
+  }
+
+  get rejectedCount(): number {
+
+    return this.purchaseRequests.filter(
+      request => request.status === 'REJECTED'
+    ).length;
+  }
+
   createRequest(): void {
-    console.log('Create purchase request');
+
+    this.router.navigate([
+      '/procurement/create'
+    ]);
   }
 
-  viewRequest(request: PurchaseRequest): void {
-    this.router.navigate(['/procurement/details', request.id]);
+  viewRequest(
+    request: PurchaseRequest
+  ): void {
+
+    this.router.navigate([
+      '/procurement/details',
+      request.id
+    ]);
   }
 
-  editRequest(request: PurchaseRequest): void {
-    console.log('Edit request:', request);
+  editRequest(
+    request: PurchaseRequest
+  ): void {
+
+    this.router.navigate([
+      '/procurement/details',
+      request.id
+    ]);
+  }
+
+  refreshRequests(): void {
+    this.loadPurchaseRequests();
   }
 }

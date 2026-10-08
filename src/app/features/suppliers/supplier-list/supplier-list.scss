@@ -315,3 +315,38 @@
     }
   }
 }
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #ffebee;
+  color: #c62828;
+}
+
+.error-message button {
+  margin-left: auto;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.table-wrapper td small {
+  display: block;
+  margin-top: 3px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.not-available {
+  color: #9ca3af;
+}

@@ -1,20 +1,44 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink
+} from '@angular/router';
+
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
-interface SupplierOrder {
-  id: string;
-  description: string;
-  date: string;
-  amount: number;
-  status: string;
-}
+import {
+  MatSnackBar,
+  MatSnackBarModule
+} from '@angular/material/snack-bar';
+
+import { SupplierService } from '../../../core/services/supplier.service';
+
+import {
+  Supplier,
+  CreateSupplier
+} from '../../../core/models/supplier.model';
 
 @Component({
   selector: 'app-supplier-details',
@@ -22,180 +46,354 @@ interface SupplierOrder {
   imports: [
     CommonModule,
     RouterLink,
+    ReactiveFormsModule,
     MatCardModule,
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
-    MatChipsModule
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSnackBarModule
   ],
   templateUrl: './supplier-details.html',
   styleUrl: './supplier-details.scss'
 })
-export class SupplierDetailsComponent {
+export class SupplierDetailsComponent implements OnInit {
+
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly supplierService = inject(SupplierService);
+  private readonly snackBar = inject(MatSnackBar);
 
-  private readonly supplierId = signal(
-    this.route.snapshot.paramMap.get('id') ?? 'SUP-1001'
-  );
+  supplier = signal<Supplier | null>(null);
 
-  private readonly supplierData = [
-    {
-      id: 'SUP-1001',
-      name: 'Tech Solutions Ltd',
-      contactPerson: 'Rajesh Kumar',
-      email: 'rajesh@techsolutions.com',
-      phone: '+91 98765 43210',
-      category: 'IT Equipment',
-      location: 'Chennai, Tamil Nadu',
-      address: 'Anna Salai, Chennai, Tamil Nadu',
-      status: 'ACTIVE',
-      riskLevel: 'LOW',
-      rating: 4.8,
-      totalOrders: 24,
-      completedOrders: 22,
-      pendingOrders: 2,
-      totalValue: 1850000,
-      registrationDate: '12 Jan 2024',
-      taxId: 'GST-33ABCDE1234F1Z5'
-    },
-    {
-      id: 'SUP-1002',
-      name: 'SecureTech Systems',
-      contactPerson: 'Arun Kumar',
-      email: 'arun@securetech.com',
-      phone: '+91 98765 12345',
-      category: 'Security',
-      location: 'Bangalore, Karnataka',
-      address: 'Electronic City, Bangalore',
-      status: 'ACTIVE',
-      riskLevel: 'LOW',
-      rating: 4.6,
-      totalOrders: 18,
-      completedOrders: 16,
-      pendingOrders: 2,
-      totalValue: 1240000,
-      registrationDate: '08 Mar 2024',
-      taxId: 'GST-29ABCDE5678F1Z2'
-    },
-    {
-      id: 'SUP-1003',
-      name: 'Industrial Systems',
-      contactPerson: 'Suresh Kumar',
-      email: 'suresh@industrialsystems.com',
-      phone: '+91 99887 66554',
-      category: 'Warehouse',
-      location: 'Coimbatore, Tamil Nadu',
-      address: 'Peelamedu, Coimbatore',
-      status: 'ACTIVE',
-      riskLevel: 'MEDIUM',
-      rating: 4.2,
-      totalOrders: 15,
-      completedOrders: 13,
-      pendingOrders: 2,
-      totalValue: 920000,
-      registrationDate: '19 Jun 2024',
-      taxId: 'GST-33ABCDE9012F1Z7'
-    },
-    {
-      id: 'SUP-1004',
-      name: 'Cloud Systems India',
-      contactPerson: 'Vignesh Raj',
-      email: 'vignesh@cloudsystems.com',
-      phone: '+91 97865 44321',
-      category: 'Cloud Services',
-      location: 'Hyderabad, Telangana',
-      address: 'Hitech City, Hyderabad',
-      status: 'ACTIVE',
-      riskLevel: 'LOW',
-      rating: 4.7,
-      totalOrders: 31,
-      completedOrders: 29,
-      pendingOrders: 2,
-      totalValue: 2650000,
-      registrationDate: '03 Feb 2024',
-      taxId: 'GST-36ABCDE3456F1Z9'
-    },
-    {
-      id: 'SUP-1005',
-      name: 'Office World',
-      contactPerson: 'Karthik S',
-      email: 'karthik@officeworld.com',
-      phone: '+91 96543 21098',
-      category: 'Office Supplies',
-      location: 'Chennai, Tamil Nadu',
-      address: 'Guindy, Chennai',
-      status: 'SUSPENDED',
-      riskLevel: 'HIGH',
-      rating: 3.5,
-      totalOrders: 9,
-      completedOrders: 7,
-      pendingOrders: 2,
-      totalValue: 340000,
-      registrationDate: '21 Sep 2024',
-      taxId: 'GST-33ABCDE7890F1Z3'
-    },
-    {
-      id: 'SUP-1006',
-      name: 'Warehouse Pro',
-      contactPerson: 'Manoj Kumar',
-      email: 'manoj@warehousepro.com',
-      phone: '+91 95678 12340',
-      category: 'Storage',
-      location: 'Madurai, Tamil Nadu',
-      address: 'Mattuthavani, Madurai',
-      status: 'ACTIVE',
-      riskLevel: 'MEDIUM',
-      rating: 4.1,
-      totalOrders: 12,
-      completedOrders: 10,
-      pendingOrders: 2,
-      totalValue: 780000,
-      registrationDate: '15 Nov 2024',
-      taxId: 'GST-33ABCDE4567F1Z8'
+  loading = false;
+  saving = false;
+  deleting = false;
+  editing = false;
+
+  errorMessage = '';
+
+  supplierForm = this.fb.nonNullable.group({
+
+    name: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3)
+      ]
+    ],
+
+    supplierCode: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2)
+      ]
+    ],
+
+    contactPerson: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3)
+      ]
+    ],
+
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email
+      ]
+    ],
+
+    phone: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^[6-9]\d{9}$/)
+      ]
+    ],
+
+    category: [
+      '',
+      Validators.required
+    ],
+
+    address: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(10)
+      ]
+    ],
+
+    city: [
+      '',
+      Validators.required
+    ],
+
+    country: [
+      'India',
+      Validators.required
+    ],
+
+    status: [
+      'ACTIVE',
+      Validators.required
+    ],
+
+    rating: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0),
+        Validators.max(5)
+      ]
+    ]
+  });
+
+  ngOnInit(): void {
+    this.loadSupplier();
+  }
+
+  loadSupplier(): void {
+
+    const idParam =
+      this.route.snapshot.paramMap.get('id');
+
+    const id = Number(idParam);
+
+    if (!idParam || Number.isNaN(id)) {
+      this.errorMessage = 'Invalid supplier ID.';
+      return;
     }
-  ];
 
-  supplier = computed(() =>
-    this.supplierData.find(s => s.id === this.supplierId()) ??
-    this.supplierData[0]
-  );
+    this.loading = true;
+    this.errorMessage = '';
 
-  orders: SupplierOrder[] = [
-    {
-      id: 'PO-2026-1042',
-      description: 'Laptop Equipment',
-      date: '04 Oct 2026',
-      amount: 245000,
-      status: 'PROCESSING'
-    },
-    {
-      id: 'PO-2026-1035',
-      description: 'Network Accessories',
-      date: '28 Sep 2026',
-      amount: 85000,
-      status: 'COMPLETED'
-    },
-    {
-      id: 'PO-2026-1021',
-      description: 'Development Workstations',
-      date: '15 Sep 2026',
-      amount: 320000,
-      status: 'COMPLETED'
-    },
-    {
-      id: 'PO-2026-1008',
-      description: 'IT Infrastructure',
-      date: '02 Sep 2026',
-      amount: 175000,
-      status: 'COMPLETED'
+    this.supplierService.getById(id).subscribe({
+
+      next: (supplier) => {
+
+        this.supplier.set(supplier);
+
+        this.supplierForm.patchValue({
+          name: supplier.name,
+          supplierCode: supplier.supplierCode,
+          contactPerson: supplier.contactPerson,
+          email: supplier.email,
+          phone: supplier.phone,
+          category: supplier.category,
+          address: supplier.address,
+          city: supplier.city,
+          country: supplier.country,
+          status: supplier.status,
+          rating: supplier.rating ?? 0
+        });
+
+        this.loading = false;
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load supplier:',
+          error
+        );
+
+        this.loading = false;
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to load supplier.';
+      }
+    });
+  }
+
+  startEdit(): void {
+    this.errorMessage = '';
+    this.editing = true;
+  }
+
+  cancelEdit(): void {
+
+    const currentSupplier =
+      this.supplier();
+
+    if (!currentSupplier) {
+      return;
     }
-  ];
 
-  editSupplier(): void {
-    console.log('Edit supplier:', this.supplier().id);
+    this.supplierForm.patchValue({
+      name: currentSupplier.name,
+      supplierCode: currentSupplier.supplierCode,
+      contactPerson: currentSupplier.contactPerson,
+      email: currentSupplier.email,
+      phone: currentSupplier.phone,
+      category: currentSupplier.category,
+      address: currentSupplier.address,
+      city: currentSupplier.city,
+      country: currentSupplier.country,
+      status: currentSupplier.status,
+      rating: currentSupplier.rating ?? 0
+    });
+
+    this.editing = false;
+    this.errorMessage = '';
+  }
+
+  updateSupplier(): void {
+
+    const currentSupplier =
+      this.supplier();
+
+    if (!currentSupplier) {
+      return;
+    }
+
+    if (this.supplierForm.invalid) {
+
+      this.supplierForm.markAllAsTouched();
+
+      return;
+    }
+
+    this.saving = true;
+    this.errorMessage = '';
+
+    const formValue =
+      this.supplierForm.getRawValue();
+
+    const supplier: CreateSupplier = {
+      name: formValue.name.trim(),
+      supplierCode: formValue.supplierCode.trim(),
+      contactPerson: formValue.contactPerson.trim(),
+      email: formValue.email.trim(),
+      phone: formValue.phone.trim(),
+      category: formValue.category,
+      address: formValue.address.trim(),
+      city: formValue.city.trim(),
+      country: formValue.country.trim(),
+      status: formValue.status,
+      rating: formValue.rating
+    };
+
+    this.supplierService
+      .update(currentSupplier.id, supplier)
+      .subscribe({
+
+        next: (updatedSupplier) => {
+
+          this.supplier.set(updatedSupplier);
+
+          this.saving = false;
+          this.editing = false;
+
+          this.snackBar.open(
+            'Supplier updated successfully',
+            'Close',
+            {
+              duration: 3000
+            }
+          );
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to update supplier:',
+            error
+          );
+
+          this.saving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to update supplier.';
+        }
+      });
+  }
+
+  deleteSupplier(): void {
+
+    const currentSupplier =
+      this.supplier();
+
+    if (!currentSupplier) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to delete ${currentSupplier.name}?`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deleting = true;
+    this.errorMessage = '';
+
+    this.supplierService
+      .delete(currentSupplier.id)
+      .subscribe({
+
+        next: () => {
+
+          this.deleting = false;
+
+          this.snackBar.open(
+            'Supplier deleted successfully',
+            'Close',
+            {
+              duration: 3000
+            }
+          );
+
+          this.router.navigate([
+            '/suppliers'
+          ]);
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to delete supplier:',
+            error
+          );
+
+          this.deleting = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to delete supplier.';
+        }
+      });
   }
 
   contactSupplier(): void {
-    window.location.href = `mailto:${this.supplier().email}`;
+
+    const currentSupplier =
+      this.supplier();
+
+    if (!currentSupplier?.email) {
+      return;
+    }
+
+    window.location.href =
+      `mailto:${currentSupplier.email}`;
+  }
+
+  formatRating(
+    rating?: number
+  ): string {
+
+    return (rating ?? 0).toFixed(1);
   }
 }

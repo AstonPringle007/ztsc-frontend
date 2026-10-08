@@ -1,271 +1,651 @@
-<div class="page-container">
+<div class="supplier-details-page">
 
+  <!-- Breadcrumb -->
   <div class="breadcrumb">
-    <a routerLink="/suppliers">Suppliers</a>
+
+    <a routerLink="/suppliers">
+      Suppliers
+    </a>
+
     <mat-icon>chevron_right</mat-icon>
-    <span>Supplier Details</span>
+
+    <span>
+      Supplier Details
+    </span>
+
   </div>
 
-  <div class="page-header">
-    <div>
-      <h1>Supplier Details</h1>
-      <p>Review supplier profile, performance and security risk.</p>
+  <!-- Loading -->
+  @if (loading) {
+
+    <div class="loading-container">
+
+      <mat-icon>hourglass_empty</mat-icon>
+
+      <p>Loading supplier...</p>
+
     </div>
 
-    <div class="header-actions">
-      <button mat-stroked-button routerLink="/suppliers">
-        <mat-icon>arrow_back</mat-icon>
-        Back
-      </button>
+  }
 
-      <button mat-raised-button color="primary" (click)="editSupplier()">
-        <mat-icon>edit</mat-icon>
-        Edit Supplier
-      </button>
+  <!-- Error -->
+  @if (errorMessage) {
+
+    <div class="error-banner">
+
+      <mat-icon>error</mat-icon>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
     </div>
-  </div>
 
-  <!-- Supplier Profile -->
-  <mat-card class="profile-card">
-    <div class="profile-main">
-      <div class="supplier-avatar">
-        {{ supplier().name.charAt(0) }}
-      </div>
+  }
 
-      <div class="profile-info">
-        <div class="name-row">
-          <h2>{{ supplier().name }}</h2>
-          <span class="status-badge"
-                [class.active]="supplier().status === 'ACTIVE'"
-                [class.suspended]="supplier().status === 'SUSPENDED'">
-            {{ supplier().status }}
-          </span>
+  @if (supplier(); as currentSupplier) {
+
+    <!-- Header -->
+    <div class="page-header">
+
+      <div class="header-info">
+
+        <div class="supplier-icon">
+          <mat-icon>business</mat-icon>
         </div>
 
-        <p>{{ supplier().category }} · {{ supplier().id }}</p>
-
-        <div class="profile-location">
-          <mat-icon>location_on</mat-icon>
-          {{ supplier().location }}
-        </div>
-      </div>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <div class="profile-actions">
-      <button mat-stroked-button (click)="contactSupplier()">
-        <mat-icon>mail</mat-icon>
-        Contact Supplier
-      </button>
-    </div>
-  </mat-card>
-
-  <!-- Metrics -->
-  <div class="metrics-grid">
-    <mat-card class="metric-card">
-      <div class="metric-icon blue">
-        <mat-icon>shopping_bag</mat-icon>
-      </div>
-      <div>
-        <span>Total Orders</span>
-        <strong>{{ supplier().totalOrders }}</strong>
-      </div>
-    </mat-card>
-
-    <mat-card class="metric-card">
-      <div class="metric-icon green">
-        <mat-icon>task_alt</mat-icon>
-      </div>
-      <div>
-        <span>Completed Orders</span>
-        <strong>{{ supplier().completedOrders }}</strong>
-      </div>
-    </mat-card>
-
-    <mat-card class="metric-card">
-      <div class="metric-icon orange">
-        <mat-icon>pending_actions</mat-icon>
-      </div>
-      <div>
-        <span>Pending Orders</span>
-        <strong>{{ supplier().pendingOrders }}</strong>
-      </div>
-    </mat-card>
-
-    <mat-card class="metric-card">
-      <div class="metric-icon purple">
-        <mat-icon>payments</mat-icon>
-      </div>
-      <div>
-        <span>Total Order Value</span>
-        <strong>{{ supplier().totalValue | currency:'INR':'symbol':'1.0-0' }}</strong>
-      </div>
-    </mat-card>
-  </div>
-
-  <div class="content-grid">
-
-    <!-- Contact Information -->
-    <mat-card class="detail-card">
-      <div class="section-heading">
-        <div class="section-icon">
-          <mat-icon>contact_page</mat-icon>
-        </div>
         <div>
-          <h2>Contact Information</h2>
-          <p>Supplier communication details</p>
+
+          <h1>
+            {{ currentSupplier.name }}
+          </h1>
+
+          <p>
+            Supplier Code:
+            {{ currentSupplier.supplierCode }}
+          </p>
+
         </div>
+
       </div>
 
-      <mat-divider></mat-divider>
+      <div class="header-actions">
 
-      <div class="detail-list">
-        <div class="detail-item">
-          <span>Contact Person</span>
-          <strong>{{ supplier().contactPerson }}</strong>
-        </div>
+        @if (!editing) {
 
-        <div class="detail-item">
-          <span>Email Address</span>
-          <strong>{{ supplier().email }}</strong>
-        </div>
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="startEdit()">
 
-        <div class="detail-item">
-          <span>Phone Number</span>
-          <strong>{{ supplier().phone }}</strong>
-        </div>
+            <mat-icon>edit</mat-icon>
 
-        <div class="detail-item">
-          <span>Business Address</span>
-          <strong>{{ supplier().address }}</strong>
-        </div>
+            Edit
 
-        <div class="detail-item">
-          <span>Tax Registration</span>
-          <strong>{{ supplier().taxId }}</strong>
-        </div>
+          </button>
 
-        <div class="detail-item">
-          <span>Registered Since</span>
-          <strong>{{ supplier().registrationDate }}</strong>
-        </div>
-      </div>
-    </mat-card>
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="contactSupplier()">
 
-    <!-- Risk Assessment -->
-    <mat-card class="detail-card">
-      <div class="section-heading">
-        <div class="section-icon security">
-          <mat-icon>security</mat-icon>
-        </div>
-        <div>
-          <h2>Zero Trust Risk Assessment</h2>
-          <p>Supplier security and trust status</p>
-        </div>
+            <mat-icon>email</mat-icon>
+
+            Contact
+
+          </button>
+
+          <button
+            mat-stroked-button
+            color="warn"
+            type="button"
+            (click)="deleteSupplier()"
+            [disabled]="deleting">
+
+            <mat-icon>delete</mat-icon>
+
+            {{ deleting ? 'Deleting...' : 'Delete' }}
+
+          </button>
+
+        }
+
       </div>
 
-      <mat-divider></mat-divider>
-
-      <div class="risk-overview">
-        <div class="risk-circle"
-             [class.low]="supplier().riskLevel === 'LOW'"
-             [class.medium]="supplier().riskLevel === 'MEDIUM'"
-             [class.high]="supplier().riskLevel === 'HIGH'">
-          <mat-icon>
-            {{ supplier().riskLevel === 'LOW' ? 'verified_user' : 'warning' }}
-          </mat-icon>
-          <strong>{{ supplier().riskLevel }}</strong>
-          <span>Risk Level</span>
-        </div>
-      </div>
-
-      <div class="risk-checks">
-        <div class="risk-check">
-          <mat-icon class="check-icon">check_circle</mat-icon>
-          <div>
-            <strong>Supplier Identity</strong>
-            <span>Registered supplier profile</span>
-          </div>
-        </div>
-
-        <div class="risk-check">
-          <mat-icon class="check-icon">check_circle</mat-icon>
-          <div>
-            <strong>Account Status</strong>
-            <span>{{ supplier().status }}</span>
-          </div>
-        </div>
-
-        <div class="risk-check">
-          <mat-icon [class.warning-icon]="supplier().riskLevel !== 'LOW'"
-                    [class.check-icon]="supplier().riskLevel === 'LOW'">
-            {{ supplier().riskLevel === 'LOW' ? 'check_circle' : 'warning' }}
-          </mat-icon>
-          <div>
-            <strong>Risk Monitoring</strong>
-            <span>
-              {{ supplier().riskLevel === 'LOW'
-                ? 'No elevated risk in mock assessment'
-                : 'Review recommended' }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="risk-note">
-        <mat-icon>info</mat-icon>
-        <p>
-          This is sample UI data. Live risk scoring and verification
-          will be connected during backend integration.
-        </p>
-      </div>
-    </mat-card>
-
-  </div>
-
-  <!-- Order History -->
-  <mat-card class="orders-card">
-    <div class="orders-heading">
-      <div>
-        <h2>Recent Order History</h2>
-        <p>Recent purchase orders associated with this supplier</p>
-      </div>
-
-      <span class="order-count">{{ orders.length }} orders</span>
     </div>
 
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Description</th>
-            <th>Order Date</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+    @if (!editing) {
 
-        <tbody>
-          @for (order of orders; track order.id) {
-            <tr>
-              <td><strong>{{ order.id }}</strong></td>
-              <td>{{ order.description }}</td>
-              <td>{{ order.date }}</td>
-              <td>{{ order.amount | currency:'INR':'symbol':'1.0-0' }}</td>
-              <td>
-                <span class="order-status"
-                      [class.completed]="order.status === 'COMPLETED'"
-                      [class.processing]="order.status === 'PROCESSING'">
-                  {{ order.status }}
+      <!-- View Mode -->
+
+      <div class="details-grid">
+
+        <!-- Basic Information -->
+        <mat-card>
+
+          <mat-card-header>
+
+            <mat-card-title>
+              Supplier Information
+            </mat-card-title>
+
+          </mat-card-header>
+
+          <mat-divider></mat-divider>
+
+          <mat-card-content>
+
+            <div class="info-grid">
+
+              <div class="info-item">
+
+                <span class="label">
+                  Supplier Name
                 </span>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </mat-card>
+
+                <span class="value">
+                  {{ currentSupplier.name }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Supplier Code
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.supplierCode }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Category
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.category }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Status
+                </span>
+
+                <span
+                  class="status-badge"
+                  [class.active]="
+                    currentSupplier.status === 'ACTIVE'
+                  "
+                  [class.suspended]="
+                    currentSupplier.status === 'SUSPENDED'
+                  "
+                  [class.inactive]="
+                    currentSupplier.status === 'INACTIVE'
+                  ">
+
+                  {{ currentSupplier.status }}
+
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Rating
+                </span>
+
+                <span class="value rating">
+
+                  <mat-icon>star</mat-icon>
+
+                  {{ formatRating(currentSupplier.rating) }}
+
+                  / 5
+
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Supplier ID
+                </span>
+
+                <span class="value">
+                  #{{ currentSupplier.id }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </mat-card-content>
+
+        </mat-card>
+
+        <!-- Contact Information -->
+        <mat-card>
+
+          <mat-card-header>
+
+            <mat-card-title>
+              Contact Information
+            </mat-card-title>
+
+          </mat-card-header>
+
+          <mat-divider></mat-divider>
+
+          <mat-card-content>
+
+            <div class="info-grid">
+
+              <div class="info-item">
+
+                <span class="label">
+                  Contact Person
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.contactPerson }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Email
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.email }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Phone
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.phone }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  City
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.city }}
+                </span>
+
+              </div>
+
+              <div class="info-item">
+
+                <span class="label">
+                  Country
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.country }}
+                </span>
+
+              </div>
+
+              <div class="info-item full">
+
+                <span class="label">
+                  Address
+                </span>
+
+                <span class="value">
+                  {{ currentSupplier.address }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </mat-card-content>
+
+        </mat-card>
+
+      </div>
+
+      <!-- Security Information -->
+      <mat-card class="security-card">
+
+        <div class="security-content">
+
+          <mat-icon>
+            security
+          </mat-icon>
+
+          <div>
+
+            <h3>
+              Zero Trust Security
+            </h3>
+
+            <p>
+              Supplier security risk is evaluated separately
+              through the security and anomaly-detection
+              modules. This page displays the supplier's
+              current operational information without
+              inventing a risk level.
+            </p>
+
+          </div>
+
+        </div>
+
+      </mat-card>
+
+    } @else {
+
+      <!-- Edit Mode -->
+
+      <mat-card class="edit-card">
+
+        <mat-card-header>
+
+          <mat-card-title>
+            Edit Supplier
+          </mat-card-title>
+
+          <mat-card-subtitle>
+            Update supplier information.
+          </mat-card-subtitle>
+
+        </mat-card-header>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-content>
+
+          <form
+            [formGroup]="supplierForm"
+            (ngSubmit)="updateSupplier()">
+
+            <div class="form-grid">
+
+              <!-- Name -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Supplier Name
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="name">
+
+                @if (
+                  supplierForm.controls.name.invalid &&
+                  supplierForm.controls.name.touched
+                ) {
+                  <mat-error>
+                    Supplier name is required
+                  </mat-error>
+                }
+
+              </mat-form-field>
+
+              <!-- Code -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Supplier Code
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="supplierCode">
+
+                @if (
+                  supplierForm.controls.supplierCode.invalid &&
+                  supplierForm.controls.supplierCode.touched
+                ) {
+                  <mat-error>
+                    Supplier code is required
+                  </mat-error>
+                }
+
+              </mat-form-field>
+
+              <!-- Contact Person -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Contact Person
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="contactPerson">
+
+              </mat-form-field>
+
+              <!-- Email -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Email
+                </mat-label>
+
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email">
+
+              </mat-form-field>
+
+              <!-- Phone -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Phone
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="phone"
+                  maxlength="10">
+
+              </mat-form-field>
+
+              <!-- Category -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Category
+                </mat-label>
+
+                <mat-select
+                  formControlName="category">
+
+                  <mat-option value="RAW_MATERIAL">
+                    Raw Material
+                  </mat-option>
+
+                  <mat-option value="ELECTRONICS">
+                    Electronics
+                  </mat-option>
+
+                  <mat-option value="PACKAGING">
+                    Packaging
+                  </mat-option>
+
+                  <mat-option value="LOGISTICS">
+                    Logistics
+                  </mat-option>
+
+                  <mat-option value="SERVICES">
+                    Services
+                  </mat-option>
+
+                  <mat-option value="OTHER">
+                    Other
+                  </mat-option>
+
+                </mat-select>
+
+              </mat-form-field>
+
+              <!-- City -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  City
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="city">
+
+              </mat-form-field>
+
+              <!-- Country -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Country
+                </mat-label>
+
+                <input
+                  matInput
+                  formControlName="country">
+
+              </mat-form-field>
+
+              <!-- Status -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Status
+                </mat-label>
+
+                <mat-select
+                  formControlName="status">
+
+                  <mat-option value="ACTIVE">
+                    Active
+                  </mat-option>
+
+                  <mat-option value="SUSPENDED">
+                    Suspended
+                  </mat-option>
+
+                  <mat-option value="INACTIVE">
+                    Inactive
+                  </mat-option>
+
+                </mat-select>
+
+              </mat-form-field>
+
+              <!-- Rating -->
+              <mat-form-field appearance="outline">
+
+                <mat-label>
+                  Rating
+                </mat-label>
+
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  formControlName="rating">
+
+              </mat-form-field>
+
+            </div>
+
+            <!-- Address -->
+            <mat-form-field
+              appearance="outline"
+              class="full-width">
+
+              <mat-label>
+                Address
+              </mat-label>
+
+              <textarea
+                matInput
+                rows="4"
+                formControlName="address">
+              </textarea>
+
+            </mat-form-field>
+
+            <!-- Edit Actions -->
+            <div class="edit-actions">
+
+              <button
+                mat-stroked-button
+                type="button"
+                (click)="cancelEdit()"
+                [disabled]="saving">
+
+                Cancel
+
+              </button>
+
+              <button
+                mat-raised-button
+                type="submit"
+                [disabled]="saving">
+
+                @if (saving) {
+
+                  <mat-icon>
+                    hourglass_empty
+                  </mat-icon>
+
+                  Saving...
+
+                } @else {
+
+                  <mat-icon>
+                    save
+                  </mat-icon>
+
+                  Save Changes
+
+                }
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </mat-card-content>
+
+      </mat-card>
+
+    }
+
+  }
 
 </div>
